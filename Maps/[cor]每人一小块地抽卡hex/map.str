@@ -1,0 +1,15 @@
+SCRIPT: jd1
+"Commander,welcome to A_piece_of_land_corona draw hex !by ggz"
+END
+
+SCRIPT: jd1?chinese
+"指挥官，欢迎来到：[COR]每人一小块地抽卡hex by ggz"
+END
+
+SCRIPT: jd2
+"(1)Expand MCV to get a view.\n(2)The space of the ocean is limited.\n(3)You will get $8 per second if you have MCV."
+END
+
+SCRIPT: jd2?chinese
+"（1）展开MCV以获取视野；\n（2）海域内可建造范围有限；\n（3）若MCV存活，玩家拥有一个隐藏油田。"
+END

@@ -1,0 +1,17 @@
+# 地图源与中间产物
+*.orig.map
+*.bak.map
+*.bak
+# MCP / 分析脚本的临时输出
+tools/_out/
+tools/**/out/
+!Maps/**/*.tga
+
+# 本地工具（不上传 git）
+tools/mcp-client/
+
+# 旧版地图底座（第一版自动改造的产物，本地留档，不进仓库）
+Maps/ALittlePlot/
+
+# 编辑器/MCP 的会话缓存
+.dsh-tools/
