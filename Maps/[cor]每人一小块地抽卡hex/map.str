@@ -1,5 +1,5 @@
 SCRIPT: jd1
-"Commander,welcome to A_piece_of_land_corona draw hex !by ggz"
+"Commander, welcome to [COR] A Piece of Land - Draw Hex ! by ggz"
 END
 
 SCRIPT: jd1?chinese
@@ -7,9 +7,17 @@ SCRIPT: jd1?chinese
 END
 
 SCRIPT: jd2
-"(1)Expand MCV to get a view.\n(2)The space of the ocean is limited.\n(3)You will get $8 per second if you have MCV."
+"(1) You start with a Crane only - no MCV, no Construction Yard.\n(2) Building is disabled for everyone. The Crane is your core, and your only way to recycle units.\n(3) Lose your Crane and you are eliminated.\n(4) Income: $40 per second, plus $20 per second for each Oil Derrick.\n(5) Every 120 seconds a private crate appears on each of your two pads.\n(6) A draw costs $2480 and summons exactly ONE random unit.\n(7) The whole map is revealed and power is unlimited."
 END
 
 SCRIPT: jd2?chinese
-"（1）展开MCV以获取视野；\n（2）海域内可建造范围有限；\n（3）若MCV存活，玩家拥有一个隐藏油田。"
+"（1）开局只有一台起重机，没有基地车、没有建造场。\n（2）本图不能建造任何建筑；起重机是你的核心，也是回收单位的唯一手段。\n（3）起重机被摧毁，该玩家直接判负。\n（4）收入：底薪 40 元/秒；每座油井额外 20 元/秒。\n（5）每隔 120 秒，你两个箱位上各刷一个私人箱子（点位已有箱子时不再叠加）。\n（6）花 2480 元抽一次卡，随机召唤【1 个】单位。\n（7）全图视野常亮，电力无限。"
+END
+
+SCRIPT: box
+"Next crate"
+END
+
+SCRIPT: box?chinese
+"下一次盲盒"
 END

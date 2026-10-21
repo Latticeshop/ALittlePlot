@@ -44,13 +44,13 @@
 			source="DATA:civilian/hawaii_ha/optimized_props/ha_rocks09.xml"
 			type="instance"/>
 		<Include
+			source="DATA:civilian/heidelberg_hb/optimized_props/hb_sidewalksegment02.xml"
+			type="instance"/>
+		<Include
 			source="DATA:civilian/iceland_il/props/il_runwaylight01.xml"
 			type="instance"/>
 		<Include
 			source="DATA:civilian/iceland_il/props/il_seacliffwall01.xml"
-			type="instance"/>
-		<Include
-			source="DATA:civilian/iceland_il/props/il_seacliffwall02.xml"
 			type="instance"/>
 		<Include
 			source="DATA:civilian/iceland_il/props/il_seacliffwall04.xml"
@@ -60,12 +60,6 @@
 			type="instance"/>
 		<Include
 			source="DATA:civilian/iceland_il/shrubbery/il_tree01.xml"
-			type="instance"/>
-		<Include
-			source="DATA:civilian/kremlin_kr/destructible_props/kr_fence01.xml"
-			type="instance"/>
-		<Include
-			source="DATA:civilian/kremlin_kr/destructible_props/kr_fence04.xml"
 			type="instance"/>
 		<Include
 			source="DATA:civilian/mount_fuji_mj/buildings/mj_boatjunk01.xml"
@@ -122,6 +116,300 @@
 	<GameMap
 		id="corhex">
 		<Waypoint
+			id="tower33">
+			<Position
+				x="3303.292261"
+				y="857.4544"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower32">
+			<Position
+				x="2790.066246"
+				y="861.238265"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower34">
+			<Position
+				x="3047.916801"
+				y="726.963048"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower31">
+			<Position
+				x="3044.810025"
+				y="1120.225862"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower23">
+			<Position
+				x="4936.707624"
+				y="1680.613444"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower22">
+			<Position
+				x="4936.249862"
+				y="2198.457228"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower21">
+			<Position
+				x="4680.667629"
+				y="1941.268264"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower24">
+			<Position
+				x="5190.741223"
+				y="1936.213221"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower43">
+			<Position
+				x="1155.129128"
+				y="1681.130027"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower42">
+			<Position
+				x="1155.188726"
+				y="2197.458828"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower41">
+			<Position
+				x="1410.539048"
+				y="1941.170884"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower44">
+			<Position
+				x="898.806585"
+				y="1941.152001"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower53">
+			<Position
+				x="1156.799528"
+				y="4354.569286"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower52">
+			<Position
+				x="1153.948642"
+				y="3840.300046"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower51">
+			<Position
+				x="1412.431786"
+				y="4101.161608"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower54">
+			<Position
+				x="900.068801"
+				y="4102.8544"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower63">
+			<Position
+				x="3300.892802"
+				y="5178.780061"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower62">
+			<Position
+				x="2785.153607"
+				y="5187.45188"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower61">
+			<Position
+				x="3044.357862"
+				y="4920.995208"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower64">
+			<Position
+				x="3041.930024"
+				y="5332.730449"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower13">
+			<Position
+				x="4935.625287"
+				y="4358.2976"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower12">
+			<Position
+				x="4935.504002"
+				y="3841.206402"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower11">
+			<Position
+				x="4678.534084"
+				y="4102.434029"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="tower14">
+			<Position
+				x="5187.721844"
+				y="4100.093225"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="center4">
+			<Position
+				x="2972.83584"
+				y="3028.882662"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="center3">
+			<Position
+				x="3008.856421"
+				y="2969.026023"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="center2">
+			<Position
+				x="3078.716803"
+				y="2969.914665"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="center1">
+			<Position
+				x="3114.026882"
+				y="3027.609063"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="center6">
+			<Position
+				x="3081.314887"
+				y="3091.303048"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="center5">
+			<Position
+				x="3005.522663"
+				y="3093.454081"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="box42">
+			<Position
+				x="947.359927"
+				y="1808.646086"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="box41">
+			<Position
+				x="1019.212328"
+				y="1733.447464"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="box32">
+			<Position
+				x="2944.781864"
+				y="619.007983"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="box31">
+			<Position
+				x="3148.447468"
+				y="620.774181"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="box22">
+			<Position
+				x="5065.791268"
+				y="1739.440425"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="box21">
+			<Position
+				x="5145.593284"
+				y="1821.877288"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="box12">
+			<Position
+				x="5136.35182"
+				y="4245.474461"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="box11">
+			<Position
+				x="5066.198087"
+				y="4310.291885"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="box61">
+			<Position
+				x="2961.266662"
+				y="5450.328424"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="box51">
+			<Position
+				x="952.24224"
+				y="4240.981223"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="box62">
+			<Position
+				x="3126.349448"
+				y="5442.899206"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="box52">
+			<Position
+				x="1030.955042"
+				y="4312.055688"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
 			id="Waypoint 77">
 			<Position
 				x="4983.479688"
@@ -145,78 +433,78 @@
 		<Waypoint
 			id="P2-1">
 			<Position
-				x="4534.773806"
-				y="1410.513604"
+				x="4315.167685"
+				y="918.421467"
 				z="0"/>
 		</Waypoint>
 		<Waypoint
 			id="P3-1">
 			<Position
-				x="1966.909068"
-				y="1414.757446"
+				x="1855.16746"
+				y="1040.068581"
 				z="0"/>
 		</Waypoint>
 		<Waypoint
 			id="P1-1">
 			<Position
-				x="5441.703686"
-				y="3769.833602"
+				x="5450.356042"
+				y="3057.610666"
 				z="0"/>
 		</Waypoint>
 		<Waypoint
 			id="P4-1">
 			<Position
-				x="1060.802723"
-				y="3762.760007"
+				x="1832.436267"
+				y="5265.807828"
 				z="0"/>
 		</Waypoint>
 		<Waypoint
 			id="P5-1">
 			<Position
-				x="3249.805442"
-				y="5491.156048"
+				x="4297.618021"
+				y="5179.024003"
 				z="0"/>
 		</Waypoint>
 		<Waypoint
 			id="Player_6_Start_High">
 			<Position
-				x="3044.023688"
-				y="5190.513604"
+				x="3017.695046"
+				y="5312.163887"
 				z="200"/>
 		</Waypoint>
 		<Waypoint
 			id="Player_5_Start_High">
 			<Position
-				x="1152.961122"
-				y="4110.151264"
+				x="1086.996323"
+				y="4180.3648"
 				z="200"/>
 		</Waypoint>
 		<Waypoint
 			id="Player_4_Start_High">
 			<Position
-				x="1151.321128"
-				y="1944.710243"
+				x="1088.695848"
+				y="1880.838882"
 				z="200"/>
 		</Waypoint>
 		<Waypoint
 			id="Player_3_Start_High">
 			<Position
-				x="3047.222824"
-				y="860.780727"
+				x="3034.046404"
+				y="586.41418"
 				z="200"/>
 		</Waypoint>
 		<Waypoint
 			id="Player_2_Start_High">
 			<Position
-				x="4932.580041"
-				y="1944.54602"
+				x="4991.141668"
+				y="1883.876264"
 				z="200"/>
 		</Waypoint>
 		<Waypoint
 			id="Player_1_Start_High">
 			<Position
-				x="4927.14762"
-				y="4109.949225"
+				x="4988.083201"
+				y="4170.882022"
 				z="200"/>
 		</Waypoint>
 		<Waypoint
@@ -486,7 +774,7 @@
 				z="0"/>
 		</Waypoint>
 		<Waypoint
-			id="Center">
+			id="center">
 			<Position
 				x="3044.219844"
 				y="3028.790086"
@@ -598,6 +886,84 @@
 				z="0"/>
 		</Waypoint>
 		<Structure
+			Angle="0.785398"
+			EventList=""
+			Faction="Player_5/teamPlayer_5"
+			Health="100"
+			Team="Player_5"
+			ThingTemplate="SovietCrane"
+			id="SovietCrane">
+			<Position
+				x="1046.495066"
+				y="4219.507885"
+				z="0"/>
+		</Structure>
+		<Structure
+			Angle="0.785398"
+			EventList=""
+			Faction="Player_6/teamPlayer_6"
+			Health="100"
+			Team="Player_6"
+			ThingTemplate="SovietCrane"
+			id="SovietCrane">
+			<Position
+				x="3043.788263"
+				y="5402.423689"
+				z="0"/>
+		</Structure>
+		<Structure
+			Angle="0.785398"
+			EventList=""
+			Faction="Player_1/teamPlayer_1"
+			Health="100"
+			Team="Player_1"
+			ThingTemplate="SovietCrane"
+			id="SovietCrane">
+			<Position
+				x="5042.990081"
+				y="4217.606401"
+				z="0"/>
+		</Structure>
+		<Structure
+			Angle="0.785398"
+			EventList=""
+			Faction="Player_2/teamPlayer_2"
+			Health="100"
+			Team="Player_2"
+			ThingTemplate="SovietCrane"
+			id="SovietCrane">
+			<Position
+				x="5049.572483"
+				y="1837.709226"
+				z="0"/>
+		</Structure>
+		<Structure
+			Angle="0.785398"
+			EventList=""
+			Faction="Player_3/teamPlayer_3"
+			Health="100"
+			Team="Player_3"
+			ThingTemplate="SovietCrane"
+			id="SovietCrane">
+			<Position
+				x="3047.571849"
+				y="639.588727"
+				z="0"/>
+		</Structure>
+		<Structure
+			Angle="0.785398"
+			EventList=""
+			Faction="Player_4/teamPlayer_4"
+			Health="100"
+			Team="Player_4"
+			ThingTemplate="SovietCrane"
+			id="SovietCrane">
+			<Position
+				x="1047.498722"
+				y="1833.696268"
+				z="0"/>
+		</Structure>
+		<Structure
 			Angle="-1.045909"
 			EventList=""
 			Faction="/team"
@@ -626,9 +992,9 @@
 		<Structure
 			Angle="-0.785399"
 			EventList=""
-			Faction="Player_6/teamPlayer_6"
+			Faction="/team"
 			Health="100"
-			Team="Player_6"
+			Team=""
 			ThingTemplate="AlliedPowerPlant"
 			id="AlliedPowerPlant">
 			<Position
@@ -639,9 +1005,9 @@
 		<Structure
 			Angle="-0.785399"
 			EventList=""
-			Faction="Player_5/teamPlayer_5"
+			Faction="/team"
 			Health="100"
-			Team="Player_5"
+			Team=""
 			ThingTemplate="AlliedPowerPlant"
 			id="AlliedPowerPlant">
 			<Position
@@ -652,9 +1018,9 @@
 		<Structure
 			Angle="-0.785399"
 			EventList=""
-			Faction="Player_4/teamPlayer_4"
+			Faction="/team"
 			Health="100"
-			Team="Player_4"
+			Team=""
 			ThingTemplate="AlliedPowerPlant"
 			id="AlliedPowerPlant">
 			<Position
@@ -665,9 +1031,9 @@
 		<Structure
 			Angle="-0.785399"
 			EventList=""
-			Faction="Player_3/teamPlayer_3"
+			Faction="/team"
 			Health="100"
-			Team="Player_3"
+			Team=""
 			ThingTemplate="AlliedPowerPlant"
 			id="AlliedPowerPlant">
 			<Position
@@ -678,9 +1044,9 @@
 		<Structure
 			Angle="-0.785399"
 			EventList=""
-			Faction="Player_2/teamPlayer_2"
+			Faction="/team"
 			Health="100"
-			Team="Player_2"
+			Team=""
 			ThingTemplate="AlliedPowerPlant"
 			id="AlliedPowerPlant">
 			<Position
@@ -691,9 +1057,9 @@
 		<Structure
 			Angle="-0.785399"
 			EventList=""
-			Faction="Player_1/teamPlayer_1"
+			Faction="/team"
 			Health="100"
-			Team="Player_1"
+			Team=""
 			ThingTemplate="AlliedPowerPlant"
 			id="AlliedPowerPlant">
 			<Position
@@ -715,29 +1081,29 @@
 				z="0"/>
 		</Structure>
 		<Structure
-			Angle="2.356194"
+			Angle="2.463447"
 			EventList=""
-			Faction="/team"
+			Faction="Player_2/teamPlayer_2"
 			Health="100"
-			Team=""
+			Team="Player_2"
 			ThingTemplate="OilDerrick"
 			id="OilDerrick">
 			<Position
-				x="5157.137289"
-				y="2070.685227"
+				x="5184.211627"
+				y="2031.040426"
 				z="0"/>
 		</Structure>
 		<Structure
-			Angle="2.356194"
+			Angle="0.759087"
 			EventList=""
-			Faction="/team"
+			Faction="Player_1/teamPlayer_1"
 			Health="100"
-			Team=""
+			Team="Player_1"
 			ThingTemplate="OilDerrick"
 			id="OilDerrick">
 			<Position
-				x="5157.137289"
-				y="4234.433842"
+				x="5178.932065"
+				y="4019.867628"
 				z="0"/>
 		</Structure>
 		<Structure
@@ -756,22 +1122,22 @@
 		<Structure
 			Angle="-0.785398"
 			EventList=""
-			Faction="/team"
+			Faction="Player_3/teamPlayer_3"
 			Health="100"
-			Team=""
+			Team="Player_3"
 			ThingTemplate="OilDerrick"
 			id="OilDerrick">
 			<Position
-				x="2913.282886"
-				y="635.201802"
+				x="3047.458022"
+				y="524.755764"
 				z="0"/>
 		</Structure>
 		<Structure
 			Angle="-2.356194"
 			EventList=""
-			Faction="/team"
+			Faction="Player_4/teamPlayer_4"
 			Health="100"
-			Team=""
+			Team="Player_4"
 			ThingTemplate="OilDerrick"
 			id="OilDerrick">
 			<Position
@@ -780,31 +1146,343 @@
 				z="0"/>
 		</Structure>
 		<Structure
-			Angle="-2.356194"
+			Angle="-0.856205"
 			EventList=""
-			Faction="/team"
+			Faction="Player_5/teamPlayer_5"
 			Health="100"
-			Team=""
+			Team="Player_5"
 			ThingTemplate="OilDerrick"
 			id="OilDerrick">
 			<Position
-				x="941.589524"
-				y="4214.353288"
+				x="940.144803"
+				y="3987.378446"
 				z="0"/>
 		</Structure>
 		<Structure
 			Angle="2.356194"
 			EventList=""
-			Faction="/team"
+			Faction="Player_6/teamPlayer_6"
 			Health="100"
-			Team=""
+			Team="Player_6"
 			ThingTemplate="OilDerrick"
 			id="OilDerrick">
 			<Position
-				x="3163.096646"
-				y="5422.37204"
+				x="3028.164266"
+				y="5505.586026"
 				z="0"/>
 		</Structure>
+		<Prop
+			Angle="1.155946"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="IL_SeaCliffWall04"
+			id="IL_SEACLIFFWALL04">
+			<Position
+				x="4996.146468"
+				y="2983.629443"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="1.155946"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="IL_SeaCliffWall04"
+			id="IL_SEACLIFFWALL04">
+			<Position
+				x="4995.8912"
+				y="3078.047684"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="2.978908"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="IL_SeaCliffWall05"
+			id="IL_SEACLIFFWALL05">
+			<Position
+				x="3962.221227"
+				y="4729.703243"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="2.978908"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="IL_SeaCliffWall05"
+			id="IL_SEACLIFFWALL05">
+			<Position
+				x="4063.271249"
+				y="4668.327242"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="-2.174672"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="IL_SeaCliffWall05"
+			id="IL_SEACLIFFWALL05">
+			<Position
+				x="2125.543464"
+				y="4718.846082"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="-2.210384"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="IL_SeaCliffWall05"
+			id="IL_SEACLIFFWALL05">
+			<Position
+				x="2027.115689"
+				y="4660.493801"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="-1.766522"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="IL_SeaCliffWall04"
+			id="IL_SEACLIFFWALL04">
+			<Position
+				x="1085.295067"
+				y="2948.410248"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="-1.960782"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="IL_SeaCliffWall04"
+			id="IL_SEACLIFFWALL04">
+			<Position
+				x="1081.453204"
+				y="3084.673607"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="0.854997"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="IL_SeaCliffWall05"
+			id="IL_SEACLIFFWALL05">
+			<Position
+				x="3969.384006"
+				y="1332.941844"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="0.854997"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="IL_SeaCliffWall05"
+			id="IL_SEACLIFFWALL05">
+			<Position
+				x="4058.673282"
+				y="1383.652804"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="-0.094545"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="IL_SeaCliffWall05"
+			id="IL_SEACLIFFWALL05">
+			<Position
+				x="2032.522409"
+				y="1388.303203"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="-0.175655"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="IL_SeaCliffWall05"
+			id="IL_SEACLIFFWALL05">
+			<Position
+				x="2142.507205"
+				y="1322.382584"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="0"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_SidewalkSegment02"
+			id="HB_SIDEWALKSEGMENT02">
+			<Position
+				x="951.982646"
+				y="4241.246405"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="0"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_SidewalkSegment02"
+			id="HB_SIDEWALKSEGMENT02">
+			<Position
+				x="2960.289065"
+				y="5450.228042"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="0"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_SidewalkSegment02"
+			id="HB_SIDEWALKSEGMENT02">
+			<Position
+				x="5135.692046"
+				y="4246.155204"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="0"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_SidewalkSegment02"
+			id="HB_SIDEWALKSEGMENT02">
+			<Position
+				x="5065.763209"
+				y="1738.885447"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="0"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_SidewalkSegment02"
+			id="HB_SIDEWALKSEGMENT02">
+			<Position
+				x="2944.67328"
+				y="618.495124"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="0"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_SidewalkSegment02"
+			id="HB_SIDEWALKSEGMENT02">
+			<Position
+				x="1018.855208"
+				y="1732.446405"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="0"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_SidewalkSegment02"
+			id="HB_SIDEWALKSEGMENT02">
+			<Position
+				x="947.806804"
+				y="1808.23744"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="-0.738022"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_SidewalkSegment02"
+			id="HB_SIDEWALKSEGMENT02">
+			<Position
+				x="3148.14848"
+				y="621.31018"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="0"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_SidewalkSegment02"
+			id="HB_SIDEWALKSEGMENT02">
+			<Position
+				x="5144.817841"
+				y="1820.916265"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="0"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_SidewalkSegment02"
+			id="HB_SIDEWALKSEGMENT02">
+			<Position
+				x="5066.326409"
+				y="4311.474446"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="0"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_SidewalkSegment02"
+			id="HB_SIDEWALKSEGMENT02">
+			<Position
+				x="3126.744004"
+				y="5442.848004"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="-1.551452"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_SidewalkSegment02"
+			id="HB_SIDEWALKSEGMENT02">
+			<Position
+				x="1030.658403"
+				y="4312.543685"
+				z="0"/>
+		</Prop>
 		<Prop
 			Angle="1.281066"
 			EventList=""
@@ -4402,8 +5080,8 @@
 			ThingTemplate="HA_Rocks04"
 			id="HA_ROCKS04">
 			<Position
-				x="1259.327606"
-				y="4533.945284"
+				x="1284.644648"
+				y="4549.569607"
 				z="0"/>
 		</Prop>
 		<Prop
@@ -6903,19 +7581,6 @@
 				z="0"/>
 		</Prop>
 		<Prop
-			Angle="-1.200891"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="IL_SeaCliffWall02"
-			id="IL_SEACLIFFWALL02">
-			<Position
-				x="2006.988642"
-				y="4657.140042"
-				z="0"/>
-		</Prop>
-		<Prop
 			Angle="-2.118102"
 			EventList=""
 			Faction="PlyrCivilian/teamPlyrCivilian"
@@ -7004,19 +7669,6 @@
 			<Position
 				x="2299.451206"
 				y="4709.739889"
-				z="0"/>
-		</Prop>
-		<Prop
-			Angle="-2.250072"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="IL_SeaCliffWall02"
-			id="IL_SEACLIFFWALL02">
-			<Position
-				x="2154.690244"
-				y="4746.281603"
 				z="0"/>
 		</Prop>
 		<Prop
@@ -7576,19 +8228,6 @@
 			<Position
 				x="4188.890464"
 				y="1459.211846"
-				z="0"/>
-		</Prop>
-		<Prop
-			Angle="2.094272"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="IL_SeaCliffWall02"
-			id="IL_SEACLIFFWALL02">
-			<Position
-				x="4089.326829"
-				y="1380.363844"
 				z="0"/>
 		</Prop>
 		<Prop
@@ -9074,19 +9713,6 @@
 				z="0"/>
 		</Prop>
 		<Prop
-			Angle="2.631867"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="IL_SeaCliffWall02"
-			id="IL_SEACLIFFWALL02">
-			<Position
-				x="4088.7232"
-				y="4676.996488"
-				z="0"/>
-		</Prop>
-		<Prop
 			Angle="3.02736"
 			EventList=""
 			Faction="PlyrCivilian/teamPlyrCivilian"
@@ -9191,45 +9817,6 @@
 				z="0"/>
 		</Prop>
 		<Prop
-			Angle="-1.18008"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="KR_Fence01"
-			id="KR_FENCE01">
-			<Position
-				x="4063.254825"
-				y="4675.362444"
-				z="0"/>
-		</Prop>
-		<Prop
-			Angle="1.051652"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="KR_Fence04"
-			id="KR_FENCE04">
-			<Position
-				x="4078.384425"
-				y="4679.220065"
-				z="0"/>
-		</Prop>
-		<Prop
-			Angle="-0.674304"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="SV_WoodPile01"
-			id="SV_WoodPile01">
-			<Position
-				x="4070.769283"
-				y="4694.817848"
-				z="0"/>
-		</Prop>
-		<Prop
 			Angle="-1.658212"
 			EventList=""
 			Faction="PlyrNeutral/teamPlyrNeutral"
@@ -9238,21 +9825,8 @@
 			ThingTemplate="SV_Rocks07"
 			id="SV_ROCKS07">
 			<Position
-				x="3963.904"
-				y="4749.259882"
-				z="0"/>
-		</Prop>
-		<Prop
-			Angle="1.089674"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="KR_Fence04"
-			id="KR_FENCE04">
-			<Position
-				x="3974.046089"
-				y="4738.080426"
+				x="3961.370464"
+				y="4746.38326"
 				z="0"/>
 		</Prop>
 		<Prop
@@ -9487,45 +10061,6 @@
 			<Position
 				x="1772.448269"
 				y="1532.069444"
-				z="0"/>
-		</Prop>
-		<Prop
-			Angle="-0.666255"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="IL_SeaCliffWall02"
-			id="IL_SEACLIFFWALL02">
-			<Position
-				x="2010.327465"
-				y="1368.47104"
-				z="0"/>
-		</Prop>
-		<Prop
-			Angle="1.27936"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="IL_SeaCliffWall02"
-			id="IL_SEACLIFFWALL02">
-			<Position
-				x="2117.086405"
-				y="1301.890325"
-				z="0"/>
-		</Prop>
-		<Prop
-			Angle="-0.179405"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="IL_SeaCliffWall02"
-			id="IL_SEACLIFFWALL02">
-			<Position
-				x="1084.483065"
-				y="2939.325224"
 				z="0"/>
 		</Prop>
 		<Prop
@@ -9906,19 +10441,6 @@
 				z="0"/>
 		</Prop>
 		<Prop
-			Angle="0.484267"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="IL_SeaCliffWall02"
-			id="IL_SEACLIFFWALL02">
-			<Position
-				x="3967.57888"
-				y="1307.856986"
-				z="0"/>
-		</Prop>
-		<Prop
 			Angle="-2.330881"
 			EventList=""
 			Faction="PlyrCivilian/teamPlyrCivilian"
@@ -10205,19 +10727,6 @@
 				z="0"/>
 		</Prop>
 		<Prop
-			Angle="-1.396222"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="IL_SeaCliffWall02"
-			id="IL_SEACLIFFWALL02">
-			<Position
-				x="1070.500322"
-				y="3102.985603"
-				z="0"/>
-		</Prop>
-		<Prop
 			Angle="-1.746112"
 			EventList=""
 			Faction="PlyrCivilian/teamPlyrCivilian"
@@ -10452,19 +10961,6 @@
 				z="0"/>
 		</Prop>
 		<Prop
-			Angle="-1.658212"
-			EventList=""
-			Faction="PlyrNeutral/teamPlyrNeutral"
-			Health="100"
-			Team="PlyrNeutral"
-			ThingTemplate="SV_Rocks07"
-			id="SV_ROCKS07">
-			<Position
-				x="1994.37386"
-				y="1372.129607"
-				z="0"/>
-		</Prop>
-		<Prop
 			Angle="-0.17492"
 			EventList=""
 			Faction="PlyrCivilian/teamPlyrCivilian"
@@ -10475,58 +10971,6 @@
 			<Position
 				x="1908.767045"
 				y="1458.134401"
-				z="0"/>
-		</Prop>
-		<Prop
-			Angle="-1.18008"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="KR_Fence01"
-			id="KR_FENCE01">
-			<Position
-				x="2109.362886"
-				y="1288.809869"
-				z="0"/>
-		</Prop>
-		<Prop
-			Angle="1.277894"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="KR_Fence01"
-			id="KR_FENCE01">
-			<Position
-				x="2019.773282"
-				y="1355.798725"
-				z="0"/>
-		</Prop>
-		<Prop
-			Angle="1.051652"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="KR_Fence04"
-			id="KR_FENCE04">
-			<Position
-				x="2124.491845"
-				y="1292.667788"
-				z="0"/>
-		</Prop>
-		<Prop
-			Angle="1.089674"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="KR_Fence04"
-			id="KR_FENCE04">
-			<Position
-				x="2004.516009"
-				y="1360.950724"
 				z="0"/>
 		</Prop>
 		<Prop
@@ -11752,19 +12196,6 @@
 				z="0"/>
 		</Prop>
 		<Prop
-			Angle="3.051404"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="IL_SeaCliffWall02"
-			id="IL_SEACLIFFWALL02">
-			<Position
-				x="4998.82762"
-				y="3107.62368"
-				z="0"/>
-		</Prop>
-		<Prop
 			Angle="1.254147"
 			EventList=""
 			Faction="PlyrCivilian/teamPlyrCivilian"
@@ -11801,32 +12232,6 @@
 			<Position
 				x="6394.809605"
 				y="3227.03104"
-				z="0"/>
-		</Prop>
-		<Prop
-			Angle="-0.674304"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="SV_WoodPile01"
-			id="SV_WoodPile01">
-			<Position
-				x="2116.877224"
-				y="1308.264262"
-				z="0"/>
-		</Prop>
-		<Prop
-			Angle="2.998918"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="SV_Snowman"
-			id="SV_Snowman">
-			<Position
-				x="2139.322667"
-				y="1291.146722"
 				z="0"/>
 		</Prop>
 		<Prop
@@ -11882,7 +12287,7 @@
 				z="0"/>
 		</Prop>
 		<Prop
-			Angle="1.981806"
+			Angle="1.920842"
 			EventList=""
 			Faction="PlyrCivilian/teamPlyrCivilian"
 			Health="100"
@@ -11892,19 +12297,6 @@
 			<Position
 				x="4988.557642"
 				y="2858.3616"
-				z="0"/>
-		</Prop>
-		<Prop
-			Angle="1.528898"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="IL_SeaCliffWall02"
-			id="IL_SEACLIFFWALL02">
-			<Position
-				x="5018.113864"
-				y="2949.986887"
 				z="0"/>
 		</Prop>
 		<Prop
@@ -12171,132 +12563,68 @@
 	<GameScriptList
 		id="_neutral_">
 		<ScriptSet>
-			<Script
-				id="»¶Ó­¶þ´´">
-				<Action
-					Type="NO_OP">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<Script
-				id="MUSIC">
-				<Action
-					Type="NO_OP">
-					<ParameterList/>
-				</Action>
-				<Action
-					Type="PATH_MUSIC_PLAY_EVENT">
-					<ParameterList/>
-				</Action>
-				<Action
-					Type="PATH_MUSIC_ENABLE_SPECIFIC_DYNAMIC_SYSTEM">
-					<ParameterList/>
-				</Action>
-			</Script>
 			<ScriptGroup
-				id="ÓÍÌïÖØÖý">
+				id="³é¿¨hex">
 				<Script
-					id="rebuild1">
+					id="³õÊ¼»¯">
 					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="SET_MILLISECOND_TIMER">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="ENABLE_SCRIPT">
+						Type="DEBUG_MESSAGE_BOX">
 						<ParameterList/>
 					</Action>
 				</Script>
 				<Script
-					id="rebuild2">
+					id="ÊÕÈë">
 					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="CREATE_NAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="OilDerrick"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="OBJECT_CREATE_RADAR_EVENT">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="ENABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-			</ScriptGroup>
-			<ScriptGroup
-				id="ÐÞ¸´»ùµØ³µ½Å±¾ÈË»úBUG">
-				<Script
-					id="¼ÆÊ±1Ãë">
-					<Action
-						Type="UNIT_KILL_ALL_IN_AREA">
+						Type="DEBUG_MESSAGE_BOX">
 						<ParameterList/>
 					</Action>
 				</Script>
 				<Script
-					id="É¾³ýµç³§">
+					id="Ë½ÓÐÏä">
 					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="SET_MILLISECOND_TIMER">
-						<ParameterList/>
-					</Action>
-				</Script>
-			</ScriptGroup>
-			<ScriptGroup
-				id="µØÍ¼½éÉÜ">
-				<Script
-					id="TL1">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="SET_MILLISECOND_TIMER">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISPLAY_TUTORIAL_TEXT">
+						Type="DEBUG_MESSAGE_BOX">
 						<ParameterList/>
 					</Action>
 				</Script>
 				<Script
-					id="TL2">
+					id="³é¿¨³õÊ¼»¯">
 					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="HIDE_TUTORIAL_TEXT">
+						Type="DEBUG_MESSAGE_BOX">
 						<ParameterList/>
 					</Action>
 				</Script>
 				<Script
-					id="TL3">
+					id="½âËø¿Æ¼¼">
 					<Action
-						Type="DISPLAY_TUTORIAL_TEXT">
+						Type="DEBUG_MESSAGE_BOX">
 						<ParameterList/>
 					</Action>
 				</Script>
 				<Script
-					id="TL4">
+					id="·¢¼¼ÄÜ">
 					<Action
-						Type="NO_OP">
+						Type="DEBUG_MESSAGE_BOX">
 						<ParameterList/>
 					</Action>
+				</Script>
+				<Script
+					id="°´Å¥À¸">
 					<Action
-						Type="HIDE_TUTORIAL_TEXT">
+						Type="DEBUG_MESSAGE_BOX">
+						<ParameterList/>
+					</Action>
+				</Script>
+				<Script
+					id="Ö¡Ñ­»·">
+					<Action
+						Type="DEBUG_MESSAGE_BOX">
+						<ParameterList/>
+					</Action>
+				</Script>
+				<Script
+					id="HUD">
+					<Action
+						Type="DEBUG_MESSAGE_BOX">
 						<ParameterList/>
 					</Action>
 				</Script>
@@ -12349,1653 +12677,27 @@
 	</GameScriptList>
 	<GameScriptList
 		id="Player_5">
-		<ScriptSet>
-			<Script
-				id="AIÖ±½Ó¸ø»ùµØ__5">
-				<Action
-					Type="NO_OP">
-					<ParameterList/>
-				</Action>
-				<Action
-					Type="ENABLE_SCRIPT">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<Script
-				id="Money">
-				<Action
-					Type="PLAYER_GIVE_MONEY">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<Script
-				id="View Get">
-				<Action
-					Type="MAP_REVEAL_ALL_PERM">
-					<ParameterList/>
-				</Action>
-				<Action
-					Type="ENABLE_SCRIPT">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<Script
-				id="View Lost">
-				<Action
-					Type="MAP_REVEAL_ALL_UNDO_PERM">
-					<ParameterList/>
-				</Action>
-				<Action
-					Type="ENABLE_SCRIPT">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<ScriptGroup
-				id="¸ù¾ÝÕóÓª¸øÆìÖÄ__5">
-				<Script
-					id="Allied__5">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_AlliedFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_AlliedFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="Celestial__5">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="CoronaMap_CelestialArmyFlag01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="CoronaMap_CelestialArmyFlag01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="Janpan__5">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="FI_PROPSFLAG"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="FI_PROPSFLAG"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="Soviet__5">
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_SovietFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_SovietFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-			</ScriptGroup>
-			<ScriptGroup
-				id="ÓÎÏ·¿ªÊ¼£º³ö³¡¶¯»­__5">
-				<Script
-					id="Áú´¬ÉÁÁÁµÇ³¡__4">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="CelestialMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="MCV´«ËÍµÇ³¡__4 2">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedSuperWeaponEffect"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="MCV´«ËÍµÇ³¡__5 1">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedSuperWeaponEffect"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="JapanMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="MCV´«ËÍµÇ³¡__6">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedSuperWeaponEffect"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="SovietMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="ÊÚÈ¨AI__4">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="TEAM_AI_TRANSFER">
-						<ParameterList/>
-					</Action>
-				</Script>
-			</ScriptGroup>
-		</ScriptSet>
+		<ScriptSet/>
 	</GameScriptList>
 	<GameScriptList
 		id="Player_6">
-		<ScriptSet>
-			<Script
-				id="AIÖ±½Ó¸ø»ùµØ__6">
-				<Action
-					Type="NO_OP">
-					<ParameterList/>
-				</Action>
-				<Action
-					Type="ENABLE_SCRIPT">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<Script
-				id="Money">
-				<Action
-					Type="PLAYER_GIVE_MONEY">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<Script
-				id="View Lost">
-				<Action
-					Type="MAP_REVEAL_ALL_UNDO_PERM">
-					<ParameterList/>
-				</Action>
-				<Action
-					Type="ENABLE_SCRIPT">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<Script
-				id="View Get">
-				<Action
-					Type="MAP_REVEAL_ALL_PERM">
-					<ParameterList/>
-				</Action>
-				<Action
-					Type="ENABLE_SCRIPT">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<ScriptGroup
-				id="¸ù¾ÝÕóÓª¸øÆìÖÄ__6">
-				<Script
-					id="Allied__6">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_AlliedFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_AlliedFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="Celestial__6">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="CoronaMap_CelestialArmyFlag01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="CoronaMap_CelestialArmyFlag01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="Janpan__6">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="FI_PROPSFLAG"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="FI_PROPSFLAG"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="Soviet__6">
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_SovietFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_SovietFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-			</ScriptGroup>
-			<ScriptGroup
-				id="ÓÎÏ·¿ªÊ¼£º³ö³¡¶¯»­__6">
-				<Script
-					id="Áú´¬ÉÁÁÁµÇ³¡__5">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="CelestialMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="MCV´«ËÍµÇ³¡__5 2">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedSuperWeaponEffect"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="MCV´«ËÍµÇ³¡__6 1">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedSuperWeaponEffect"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="JapanMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="MCV´«ËÍµÇ³¡__7">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedSuperWeaponEffect"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="SovietMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="ÊÚÈ¨AI__5">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="TEAM_AI_TRANSFER">
-						<ParameterList/>
-					</Action>
-				</Script>
-			</ScriptGroup>
-		</ScriptSet>
+		<ScriptSet/>
 	</GameScriptList>
 	<GameScriptList
 		id="Player_3">
-		<ScriptSet>
-			<Script
-				id="AIÖ±½Ó¸ø»ùµØ__3">
-				<Action
-					Type="NO_OP">
-					<ParameterList/>
-				</Action>
-				<Action
-					Type="ENABLE_SCRIPT">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<Script
-				id="Money">
-				<Action
-					Type="PLAYER_GIVE_MONEY">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<Script
-				id="View Lost">
-				<Action
-					Type="MAP_REVEAL_ALL_UNDO_PERM">
-					<ParameterList/>
-				</Action>
-				<Action
-					Type="ENABLE_SCRIPT">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<Script
-				id="View Get">
-				<Action
-					Type="MAP_REVEAL_ALL_PERM">
-					<ParameterList/>
-				</Action>
-				<Action
-					Type="ENABLE_SCRIPT">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<ScriptGroup
-				id="¸ù¾ÝÕóÓª¸øÆìÖÄ__3">
-				<Script
-					id="Allied__3">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_AlliedFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_AlliedFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="Celestial__3">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="CoronaMap_CelestialArmyFlag01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="CoronaMap_CelestialArmyFlag01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="Janpan__3">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="FI_PROPSFLAG"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="FI_PROPSFLAG"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="Soviet__3">
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_SovietFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_SovietFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-			</ScriptGroup>
-			<ScriptGroup
-				id="ÓÎÏ·¿ªÊ¼£º³ö³¡¶¯»­__3">
-				<Script
-					id="Áú´¬ÉÁÁÁµÇ³¡__2">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="CelestialMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="MCV´«ËÍµÇ³¡__2 2">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedSuperWeaponEffect"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="MCV´«ËÍµÇ³¡__3 1">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedSuperWeaponEffect"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="JapanMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="MCV´«ËÍµÇ³¡__4">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedSuperWeaponEffect"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="SovietMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="ÊÚÈ¨AI__2">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="TEAM_AI_TRANSFER">
-						<ParameterList/>
-					</Action>
-				</Script>
-			</ScriptGroup>
-		</ScriptSet>
+		<ScriptSet/>
 	</GameScriptList>
 	<GameScriptList
 		id="Player_4">
-		<ScriptSet>
-			<Script
-				id="AIÖ±½Ó¸ø»ùµØ__4">
-				<Action
-					Type="NO_OP">
-					<ParameterList/>
-				</Action>
-				<Action
-					Type="ENABLE_SCRIPT">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<Script
-				id="Money">
-				<Action
-					Type="PLAYER_GIVE_MONEY">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<Script
-				id="View Lost">
-				<Action
-					Type="MAP_REVEAL_ALL_UNDO_PERM">
-					<ParameterList/>
-				</Action>
-				<Action
-					Type="ENABLE_SCRIPT">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<Script
-				id="View Get">
-				<Action
-					Type="MAP_REVEAL_ALL_PERM">
-					<ParameterList/>
-				</Action>
-				<Action
-					Type="ENABLE_SCRIPT">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<ScriptGroup
-				id="¸ù¾ÝÕóÓª¸øÆìÖÄ__4">
-				<Script
-					id="Allied__4">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_AlliedFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_AlliedFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="Celestial__4">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="CoronaMap_CelestialArmyFlag01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="CoronaMap_CelestialArmyFlag01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="Janpan__4">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="FI_PROPSFLAG"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="FI_PROPSFLAG"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="Soviet__4">
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_SovietFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_SovietFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-			</ScriptGroup>
-			<ScriptGroup
-				id="ÓÎÏ·¿ªÊ¼£º³ö³¡¶¯»­__4">
-				<Script
-					id="Áú´¬ÉÁÁÁµÇ³¡__3">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="CelestialMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="MCV´«ËÍµÇ³¡__3 2">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedSuperWeaponEffect"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="MCV´«ËÍµÇ³¡__4 1">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedSuperWeaponEffect"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="JapanMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="MCV´«ËÍµÇ³¡__5">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedSuperWeaponEffect"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="SovietMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="ÊÚÈ¨AI__3">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="TEAM_AI_TRANSFER">
-						<ParameterList/>
-					</Action>
-				</Script>
-			</ScriptGroup>
-		</ScriptSet>
+		<ScriptSet/>
 	</GameScriptList>
 	<GameScriptList
 		id="Player_1">
-		<ScriptSet>
-			<Script
-				id="AIÖ±½Ó¸ø»ùµØ__1">
-				<Action
-					Type="NO_OP">
-					<ParameterList/>
-				</Action>
-				<Action
-					Type="ENABLE_SCRIPT">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<Script
-				id="Money">
-				<Action
-					Type="PLAYER_GIVE_MONEY">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<Script
-				id="View Lost">
-				<Action
-					Type="MAP_REVEAL_ALL_UNDO_PERM">
-					<ParameterList/>
-				</Action>
-				<Action
-					Type="ENABLE_SCRIPT">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<Script
-				id="View Get">
-				<Action
-					Type="MAP_REVEAL_ALL_PERM">
-					<ParameterList/>
-				</Action>
-				<Action
-					Type="ENABLE_SCRIPT">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<ScriptGroup
-				id="¸ù¾ÝÕóÓª¸øÆìÖÄ__1">
-				<Script
-					id="Allied__1">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_AlliedFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_AlliedFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="Celestial__1">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="CoronaMap_CelestialArmyFlag01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="CoronaMap_CelestialArmyFlag01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="Janpan__1">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="FI_PROPSFLAG"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="FI_PROPSFLAG"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="Soviet__1">
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_SovietFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_SovietFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-			</ScriptGroup>
-			<ScriptGroup
-				id="ÓÎÏ·¿ªÊ¼£º³ö³¡¶¯»­__1">
-				<Script
-					id="Áú´¬ÉÁÁÁµÇ³¡">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="CelestialMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="MCV´«ËÍµÇ³¡">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedSuperWeaponEffect"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="MCV´«ËÍµÇ³¡__1">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedSuperWeaponEffect"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="JapanMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="MCV´«ËÍµÇ³¡__2">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedSuperWeaponEffect"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="SovietMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="ÊÚÈ¨AI">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="TEAM_AI_TRANSFER">
-						<ParameterList/>
-					</Action>
-				</Script>
-			</ScriptGroup>
-		</ScriptSet>
+		<ScriptSet/>
 	</GameScriptList>
 	<GameScriptList
 		id="Player_2">
-		<ScriptSet>
-			<Script
-				id="AIÖ±½Ó¸ø»ùµØ__2">
-				<Action
-					Type="NO_OP">
-					<ParameterList/>
-				</Action>
-				<Action
-					Type="ENABLE_SCRIPT">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<Script
-				id="Money">
-				<Action
-					Type="PLAYER_GIVE_MONEY">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<Script
-				id="View Lost">
-				<Action
-					Type="MAP_REVEAL_ALL_UNDO_PERM">
-					<ParameterList/>
-				</Action>
-				<Action
-					Type="ENABLE_SCRIPT">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<Script
-				id="View Get">
-				<Action
-					Type="MAP_REVEAL_ALL_PERM">
-					<ParameterList/>
-				</Action>
-				<Action
-					Type="ENABLE_SCRIPT">
-					<ParameterList/>
-				</Action>
-			</Script>
-			<ScriptGroup
-				id="¸ù¾ÝÕóÓª¸øÆìÖÄ__2">
-				<Script
-					id="Allied__2">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_AlliedFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_AlliedFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="Celestial__2">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="CoronaMap_CelestialArmyFlag01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="CoronaMap_CelestialArmyFlag01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="Janpan__2">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="FI_PROPSFLAG"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="FI_PROPSFLAG"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="Soviet__2">
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_SovietFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="EI_SovietFlagPole01"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-			</ScriptGroup>
-			<ScriptGroup
-				id="ÓÎÏ·¿ªÊ¼£º³ö³¡¶¯»­__2">
-				<Script
-					id="Áú´¬ÉÁÁÁµÇ³¡__1">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="CelestialMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="MCV´«ËÍµÇ³¡__1 1">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedSuperWeaponEffect"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="MCV´«ËÍµÇ³¡__2 1">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedSuperWeaponEffect"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="JapanMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="MCV´«ËÍµÇ³¡__3">
-					<Action
-						Type="SET_REF_TO_NEREST_TEAM_OF_TYPE_OWNED_BY_PLAYER">
-						<ParameterList>
-							<ObjectTypeList/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="AlliedSuperWeaponEffect"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION">
-						<ParameterList>
-							<ObjectType
-								Object="SovietMCV"/>
-						</ParameterList>
-					</Action>
-					<Action
-						Type="NAMED_DELETE">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="DISABLE_SCRIPT">
-						<ParameterList/>
-					</Action>
-				</Script>
-				<Script
-					id="ÊÚÈ¨AI__1">
-					<Action
-						Type="NO_OP">
-						<ParameterList/>
-					</Action>
-					<Action
-						Type="TEAM_AI_TRANSFER">
-						<ParameterList/>
-					</Action>
-				</Script>
-			</ScriptGroup>
-		</ScriptSet>
+		<ScriptSet/>
 	</GameScriptList>
 	<GameScriptList
 		id="PlyrAllies">
