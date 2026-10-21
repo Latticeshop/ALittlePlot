@@ -1,11 +1,5 @@
 -- ============================================================
--- 抽卡卡池 —— **自动生成，勿手改**
--- 生成器：ALittlePlot/tools/build-pool.js
--- 真源  ：作者《完整单位表》（T1~T5，按 步兵|载具|空军|海军 分组）
---          中文名→类型名 字典：日冕地图lua例子/自定义抽卡池.txt
---                              DSA HextechRune/05_ultimate_creature.lua
--- 说明  ：T5 并入 T4；每个条目都是 1 个；类别 1步兵 2载具 3空军 4海军 5两栖
---          （两栖=水陆都能刷；海军只在水里刷；步兵/载具只在陆地刷；空军不限）
+-- 抽卡卡池：自动生成勿手改，生成器 tools/build-pool.js（真源=作者《完整单位表》）
 -- ============================================================
 
 ChoukaDrawTierWeights = { 37, 50, 10, 2.5, 0.5 }
@@ -52,13 +46,13 @@ ChoukaUnitCategory = {
     CelestialAdvanceAircraftTech4 = 3, SovietTransportAircraft_HeavyCannon = 3, CelestialEngineerRepairDroneLv2 = 3,
     CelestialEngineerRepairDroneLv3 = 3,
     -- 海军（23）
-    CelestialMCV = 4, AlliedAntiNavalScout = 4, AlliedAntiAirShip = 4,
-    JapanNavyScoutShip = 4, CelestialAntiNavyShipTech1 = 4, AlliedAntiNavyShipTech1 = 4,
-    SovietAntiNavyShipTech2 = 4, JapanAntiVehicleShip = 4, CelestialAlmightlyShip = 4,
-    JapanAntiAirShip = 4, AlliedAntiNavyShipTech3 = 4, SovietAntiNavyShipTech3 = 4,
-    JapanAntiNavyShipTech3 = 4, CelestialAntiNavyShipTech3 = 4, CelestialSeized_JapanAntiNavyShipTech3 = 4,
-    AlliedAircraftCarrier = 4, SovietAntiStructureShip = 4, JapanAntiStructureShip = 4,
-    CelestialAntiStructureShip = 4, JapanGigaFortress_Land = 4, AlliedThetisBattleShip = 4,
+    AlliedAntiNavalScout = 4, AlliedAntiAirShip = 4, JapanNavyScoutShip = 4,
+    CelestialAntiNavyShipTech1 = 4, AlliedAntiNavyShipTech1 = 4, SovietAntiNavyShipTech2 = 4,
+    JapanAntiVehicleShip = 4, CelestialAlmightlyShip = 4, JapanAntiAirShip = 4,
+    AlliedAntiNavyShipTech3 = 4, SovietAntiNavyShipTech3 = 4, JapanAntiNavyShipTech3 = 4,
+    CelestialAntiNavyShipTech3 = 4, CelestialSeized_JapanAntiNavyShipTech3 = 4, AlliedAircraftCarrier = 4,
+    SovietAntiStructureShip = 4, JapanAntiStructureShip = 4, CelestialAntiStructureShip = 4,
+    JapanGigaFortress_Land = 4, AlliedThetisBattleShip = 4, CelestialMCV = 4,
     AlliedGaintAirCraftCarrier_B = 4, JapanYumiAircraftCarrier = 4,
     -- 两栖（5）
     SovietAntiAirShip = 5, CelestialAntiInfantryVehicle_B = 5, CelestialAntiAirVehicle = 5,
@@ -125,11 +119,11 @@ ChoukaDrawPoolBySide = {
             "JapanMechaX", "JapanAntiStructureShip", "JapanGigaFortress_Land",
         },
     },
-    [4] = {   -- 神州（30 种）
+    [4] = {   -- 神州（29 种）
         [1] = {
             "CelestialScoutDrone", "CelestialAntiInfantryInfantry", "CelestialAntiVehicleInfantry", "CelestialAntiInfantryVehicle_B",
-            "CelestialAntiAirVehicle", "CelestialMCV", "CelestialMBT99A", "CelestialMBT99B",
-            "CelestialSupportAircraft", "CelestialFighterAircraft", "CelestialAntiNavyShipTech1",
+            "CelestialAntiAirVehicle", "CelestialMBT99A", "CelestialMBT99B", "CelestialSupportAircraft",
+            "CelestialFighterAircraft", "CelestialAntiNavyShipTech1",
         },
         [2] = {
             "CelestialInfiltrationInfantry", "CelestialAntiVehicleVehicleTech1", "CelestialWaveriderIFV_ATGM", "CelestialWheeledAssaultVehicle",

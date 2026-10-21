@@ -12566,6 +12566,27 @@
 			<ScriptGroup
 				id="³é¿¨hex">
 				<Script
+					id="×Ô¼ì">
+					<Action
+						Type="DEBUG_MESSAGE_BOX">
+						<ParameterList/>
+					</Action>
+				</Script>
+				<Script
+					id="¿ª¾Ö">
+					<Action
+						Type="DEBUG_MESSAGE_BOX">
+						<ParameterList/>
+					</Action>
+				</Script>
+				<Script
+					id="Ëæ»úÏäÇåÀí">
+					<Action
+						Type="DEBUG_MESSAGE_BOX">
+						<ParameterList/>
+					</Action>
+				</Script>
+				<Script
 					id="³õÊ¼»¯">
 					<Action
 						Type="DEBUG_MESSAGE_BOX">
@@ -12587,7 +12608,28 @@
 					</Action>
 				</Script>
 				<Script
+					id="µ¥Î»µÇ¼Ç">
+					<Action
+						Type="DEBUG_MESSAGE_BOX">
+						<ParameterList/>
+					</Action>
+				</Script>
+				<Script
 					id="³é¿¨³õÊ¼»¯">
+					<Action
+						Type="DEBUG_MESSAGE_BOX">
+						<ParameterList/>
+					</Action>
+				</Script>
+				<Script
+					id="±£µ×¾üÈ®">
+					<Action
+						Type="DEBUG_MESSAGE_BOX">
+						<ParameterList/>
+					</Action>
+				</Script>
+				<Script
+					id="ÖÐÑëÓÍ¾®">
 					<Action
 						Type="DEBUG_MESSAGE_BOX">
 						<ParameterList/>
@@ -12609,6 +12651,13 @@
 				</Script>
 				<Script
 					id="°´Å¥À¸">
+					<Action
+						Type="DEBUG_MESSAGE_BOX">
+						<ParameterList/>
+					</Action>
+				</Script>
+				<Script
+					id="AI¶ÔÊÖ">
 					<Action
 						Type="DEBUG_MESSAGE_BOX">
 						<ParameterList/>

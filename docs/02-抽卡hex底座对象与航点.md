@@ -1,4 +1,4 @@
-# 05 · 抽卡hex 底座数据：对象 / 航点 / 触发区
+﻿# 05 · 抽卡hex 底座数据：对象 / 航点 / 触发区
 
 > 数据来源：Ra3MapEditor MCP 实测（`ra3map_describe_map` / `ra3map_list_objects{includeProps:true}` / `ra3map_get_areas`），
 > 落盘在 `tools/mcp-client/out/v2_full.txt`。对象名取的是 `props.objectName`（航点另取 `waypointName`），
@@ -87,7 +87,7 @@
 | `center4` | (2973, 3029) | 航点 | 同上 |
 | `center5` | (3006, 3093) | 航点 | 同上 |
 | `center6` | (3081, 3091) | 航点 | 同上 |
-| `Center2` ×2 | (2859, 3026) / (3227, 3025) | `OilDerrick`（中性 `/team`，不可摧毁） | ⚠️ **两个中央油井同名 `Center2`**，且与脚本 `油田重铸` 里当"哨兵"用的名字撞车 |
+| `centerOil1` / `centerOil2` | (2859, 3026) / (3227, 3025) | `OilDerrick`（中性 `/team`，不可摧毁） | ⚠️ **本行曾写成"两座都叫 `Center2`"，已过时** —— 作者 2026-10 实测：地图里就是 `centerOil1` / `centerOil2`，脚本按真名取即可（`06_center.lua` 仍保留了几何兜底） |
 | `规范方框` | 六边形 (3041,3155)(3168,3031)(3043,2905)(2912,3031) | 触发区 | 中心岛范围 |
 
 ## 6 触发区
@@ -105,7 +105,7 @@
    它们与 `crane1`~`crane6` 一一绑定，是"隐形电厂 + 存在证明"（`objectIndestructible=true`），
    所以位置不动。要处理的只有旧脚本 `修复基地车脚本人机BUG/计时1秒`（每帧 `UNIT_KILL_ALL_IN_AREA <All Players> DieAreaBUG`）——
    新设计里没有 AI 基地车可修，这条要停用/删除。
-3. **`Center2` 重名**：中央两座中性油井都叫 `Center2`，而原图 `油田重铸` 组正是拿 `Center2` 当哨兵（被摧毁 → 重建）。
+3. ~~**`Center2` 重名**~~（已作废）：作者实测中央两座油井是 `centerOil1` / `centerOil2`，不存在重名。原图 `油田重铸` 用的哨兵名另算，本图脚本不依赖它。
 4. **`center` 改名**：原图 `油田重铸/rebuild2` 里生成油井用的是航点 `Center`（大写），现在地图上是 `center`（小写）→ 该组一旦启用就会找不到航点。
 
 ## 8 复现命令

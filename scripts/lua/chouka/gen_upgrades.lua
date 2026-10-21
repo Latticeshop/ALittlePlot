@@ -1,10 +1,5 @@
 -- ============================================================
--- 开局解锁的全部科技协议 —— **自动生成，勿手改**
--- 生成器：ALittlePlot/tools/build-upgrades.js
--- ⚠ 玩家不能造建筑，科技协议也买不了，所以干脆全部直接发下去。
--- 名单来源：双兵种作战 Tech_Upgrade + Enhanced_Tech_Upgrade，
---           DSA Upgrade.lua 的 upgrades 列表，双兵种 UpgradeEnum 全量枚举。
--- 共 34 条，其中龙船专属 7 条。
+-- 开局科技协议：自动生成勿手改（tools/build-upgrades.js）；共 34 条，龙船专属 7 条
 -- ============================================================
 
 ChoukaUnlockUpgrades = {

@@ -93,6 +93,14 @@ const BLACKLIST = [
     // 注：维修天灯 CelestialEngineerRepairDrone **不剔除** —— 作者明确要能抽到（场上维修很有用）
 ];
 
+// 「档位钉死」（作者 2026-10）：这些类型**只允许出现在指定档**，别的档一律跳过。
+//   · CelestialMCV = 青龙战斗核心舰，本质就是 T5 单位 —— 以前它跟着「各国基地车」被塞进
+//     神州 T1 载具，于是抽卡会抽到基地车。现在只在 T5 出。
+//   · 其余三家的基地车（AlliedMCV / SovietMCV / JapanMCV）在 BLACKLIST 里，永不进池。
+const TIER_PIN = {
+    CelestialMCV: 5,
+};
+
 const FACTION_BY_PREFIX = [
     [/^Allied/, 1], [/^prismtank/, 1], [/^RheinEntente/, 1],
     [/^Soviet/, 2], [/^VU/, 2], [/^WinterArmy/, 2], [/^Overlord/, 2],
@@ -171,6 +179,7 @@ function main() {
     const ambiguousFaction = [];
     const fuzzyLog = [];
     const blacklisted = [];
+const pinned = [];
     const perSide = { 1: new Map(), 2: new Map(), 3: new Map(), 4: new Map() };
     const t5 = [];
     const category = new Map();
@@ -180,6 +189,10 @@ function main() {
         const ourTier = tier;               // 现在 T1~T5 各自独立，不再并档
         if (BLACKLIST.indexOf(type) >= 0) {
             blacklisted.push(`${zhLabel} → ${type}`);
+            return false;
+        }
+        if (TIER_PIN[type] !== undefined && TIER_PIN[type] !== ourTier) {
+            pinned.push(`${zhLabel} → ${type}（只留在 T${TIER_PIN[type]}，T${ourTier} 跳过）`);
             return false;
         }
         const faction = factionOf(type);
@@ -254,14 +267,10 @@ function main() {
 
     // ---- 输出 ----
     const out = [];
+    // ★ lua 头只留 3 行：ScriptsData.json 的 payload 会把注释一起算进节点体积（上限 64KB），
+    //   详细说明留在本文件（JS 注释不进游戏），别写进生成的 lua。
     out.push('-- ============================================================');
-    out.push('-- 抽卡卡池 —— **自动生成，勿手改**');
-    out.push('-- 生成器：ALittlePlot/tools/build-pool.js');
-    out.push('-- 真源  ：作者《完整单位表》（T1~T5，按 步兵|载具|空军|海军 分组）');
-    out.push('--          中文名→类型名 字典：日冕地图lua例子/自定义抽卡池.txt');
-    out.push('--                              DSA HextechRune/05_ultimate_creature.lua');
-    out.push('-- 说明  ：T5 并入 T4；每个条目都是 1 个；类别 1步兵 2载具 3空军 4海军 5两栖');
-    out.push('--          （两栖=水陆都能刷；海军只在水里刷；步兵/载具只在陆地刷；空军不限）');
+    out.push('-- 抽卡卡池：自动生成勿手改，生成器 tools/build-pool.js（真源=作者《完整单位表》）');
     out.push('-- ============================================================');
     out.push('');
     out.push(`ChoukaDrawTierWeights = { ${TIER_WEIGHTS.join(', ')} }`);
@@ -323,6 +332,10 @@ function main() {
         for (const line of fuzzyLog) console.log(`      ${line}`);
     }
     if (blacklisted.length) {
+    if (pinned.length) {
+        console.log(`  · 按 TIER_PIN 只留在指定档的 ${pinned.length} 个：`);
+        console.log(`      ${pinned.join('、')}`);
+    }
         console.log(`  · 按 BLACKLIST 剔除「不能打架」的 ${blacklisted.length} 个：`);
         console.log(`      ${blacklisted.join('、')}`);
     }

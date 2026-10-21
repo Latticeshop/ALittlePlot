@@ -31,6 +31,39 @@ const PAYLOAD_WARN_LIMIT = 64512;
 /** 一个地编脚本节点 = 一个或多个 Lua 文件拼成的一段 payload（DSA 也是这么拼的）。顺序即执行顺序。 */
 const NODES = [
     {
+        // ★ 自检 / 心跳：必须排第一。整局每 10 秒往日志写一行
+        //   （CoronaData/Logs/EnhancerCorona-*.dll.log），说明"脚本还活着、开局门控过了没、
+        //   回合/倒计时在不在动、哪些节点真的跑起来了"。前面任何节点报错都不影响它。
+        file: 'lua/chouka/00_selfcheck.lua',
+        folder: '抽卡hex',
+        name: '自检',
+        evaluationInterval: 1,
+        deactivateUponSuccess: false,
+    },
+    {
+        // ★ 开局：锁视角 + 全屏公告 + 房主选配置 + 正式开始（照 DSA 的三段开局，去掉运镜）
+        //   必须排在最前面：它定义了 onUserBtnChoiceDialogEvent / onUserLongTextDialogEvent
+        //   的分发器，后面的「按钮栏」节点只往分发器里注册自己的处理函数。
+        //   常驻（不一次性停用）：回调函数要靠它每秒重新定义一次。
+        //   CHOUKA_GAME_STARTED 是全场开局门控，收入/盲盒/军犬/中央/按钮都看它。
+        file: 'lua/chouka/03_start.lua',
+        folder: '抽卡hex',
+        name: '开局',
+        evaluationInterval: 1,       // 一秒节点：等待期重钉视角、重刷中心提示
+        deactivateUponSuccess: false,
+    },
+    {
+        // ★ 引擎随机箱清理：照 DSA PureDraw/06_init_mcv.lua:43-79 的两段延迟删除，
+        //   除了 02_private_box / 06_center 在预设点位刷的箱子，场上不出现任何自然随机箱。
+        //   每帧节点 + 自己的帧计数（1 帧删生成器 → 45 帧清已落地的实体箱 → 前 2 分钟每 10 秒兜底）。
+        //   不能一次性停用，否则 45 帧那一遍跑不到。
+        file: 'lua/chouka/07_crates.lua',
+        folder: '抽卡hex',
+        name: '随机箱清理',
+        evaluationInterval: 0,       // 每帧
+        deactivateUponSuccess: false,
+    },
+    {
         // 初始化节点：抽卡等级表要先于一切（交易市场按钮、HUD、抽卡都用它）
         files: [
             'lua/chouka/09_level.lua',
@@ -49,25 +82,56 @@ const NODES = [
         deactivateUponSuccess: false,
     },
     {
+        // 私有箱：**每秒节点自己数秒**（原来 interval 直接吃 BOX_SECONDS=120）。
+        // 原因见 02_private_box.lua 文件头：节点间隔从进游戏算起，和"房主确认开局"
+        // 那个时间点对不齐，改成每秒节点 + 自己数 CHOUKA_BOX_LEFT 才准。
         file: 'lua/chouka/02_private_box.lua',
         folder: '抽卡hex',
         name: '私有箱',
-        // 间隔直接从 lua 里的 BOX_SECONDS 读，避免"改了 lua 忘了改这里"
-        intervalFromLua: { constant: 'BOX_SECONDS', fallback: 120 },
+        evaluationInterval: 1,
         deactivateUponSuccess: false,
     },
     {
-        // 抽卡系统：数据 → 卡池 → 钩子 → 替换/帧队列，拼成一次性初始化
+        // 单位出生事件登记：整表登记（gen_allunits.lua = 日冕单位信息汇总.txt 全表）
+        // 必须在任何单位出生前跑完，所以排在初始化后面、抽卡初始化前面。
+        // 只跑一次（deactivateUponSuccess），但 onUnitCreateEvent 是全局函数，登记与它都常驻。
         files: [
-            'lua/chouka/10_puredraw_data.lua',
+            'lua/chouka/gen_allunits.lua',
+            'lua/chouka/11a_register.lua',
+        ],
+        folder: '抽卡hex',
+        name: '单位登记',
+        evaluationInterval: 0,
+        deactivateUponSuccess: true,
+    },
+    {
+        // 抽卡系统：数据 → 卡池 → 替换/帧队列，拼成一次性初始化
+        files: [
+            'lua/chouka/09a_watermask.lua',      // 地图掩码（从地图预览图提取的海陆），必须先于判定脚本
+    'lua/chouka/10_puredraw_data.lua',
             'lua/chouka/gen_pool.lua',
-            'lua/chouka/11_puredraw_hook.lua',
             'lua/chouka/12_puredraw_replace.lua',
         ],
         folder: '抽卡hex',
         name: '抽卡初始化',
         evaluationInterval: 0,
         deactivateUponSuccess: true,
+    },
+    {
+        // 保底军犬 + 中央油井：放在"抽卡初始化"之后，才能用上卡池表与 CHOUKA_ROUND。
+        // 拆成两个节点，一边出错不会把另一边也带死。
+        file: 'lua/chouka/05_dog.lua',
+        folder: '抽卡hex',
+        name: '保底军犬',
+        evaluationInterval: 1,
+        deactivateUponSuccess: false,
+    },
+    {
+        file: 'lua/chouka/06_center.lua',
+        folder: '抽卡hex',
+        name: '中央油井',
+        evaluationInterval: 1,
+        deactivateUponSuccess: false,
     },
     {
         // 解锁科技：玩家造不了建筑、也买不到科技协议，索性开局全发下去。
@@ -83,13 +147,15 @@ const NODES = [
         deactivateUponSuccess: true,
     },
     {
-        // 发抽卡技能单独放一秒节点，不塞进第 0 帧的初始化里：
+        // 发抽卡技能（单抽 + 十连）单独放一秒节点，不塞进第 0 帧的初始化里：
         // 第 0 帧玩家的科技/技能表可能还没就绪，晚一秒更稳（DSA 也是等建筑发放时才发）。
+        // ★ 不能一次性停用 —— 房主确认开局之后才发技能（脚本内部门控 CHOUKA_GAME_STARTED），
+        //   而节点从进游戏 1 秒就开始求值，一次性会在"还没开局"时就自我停用。
         file: 'lua/chouka/14_grant_draw.lua',
         folder: '抽卡hex',
         name: '发技能',
         evaluationInterval: 1,
-        deactivateUponSuccess: true,
+        deactivateUponSuccess: false,
     },
     {
         // 顶部按钮栏：3 = 交易市场、4 = 海克斯（1/2/5/6 留空），点开是选择对话框
@@ -99,6 +165,20 @@ const NODES = [
         folder: '抽卡hex',
         name: '按钮栏',
         evaluationInterval: 1,       // 一秒节点
+        deactivateUponSuccess: false,
+    },
+    {
+        // AI 对手（电脑）：
+        //   ① 每回合给每个电脑座位免费抽 1 个单位（走同一套卡池/阵营池/水陆判定，
+        //      概率取"自动升级"那条线）—— 模拟电脑也在抽卡
+        //   ② 周期扫描非玩家阵营（PlyrCivilian / PlyrCreeps）的单位，
+        //      照 DSA PureDrawJoinAIAttackTeam 塞进 "<阵营>/ATTACK" 攻击队，
+        //      让原本站着不动的中立单位主动去打玩家
+        // 不能一次性停用：整局都要跑（脚本内部靠 CHOUKA_ROUND 变化触发抽卡）
+        file: 'lua/chouka/17_ai.lua',
+        folder: '抽卡hex',
+        name: 'AI对手',
+        evaluationInterval: 1,       // 一秒节点：回合变化判定 + 5 秒一次的扫场
         deactivateUponSuccess: false,
     },
     {
@@ -138,6 +218,18 @@ function readLuaBody(relPath) {
     const abs = path.join(SCRIPTS_DIR, relPath);
     if (!fs.existsSync(abs)) throw new Error(`找不到 Lua 源文件：${abs}`);
     let text = fs.readFileSync(abs, 'utf8');
+
+    // ★★ 致命坑（2026-10 实测踩过一次，一次废掉 10 个节点）：
+    //    Windows PowerShell 的 `Set-Content -Encoding utf8` 会写 UTF-8 BOM（EF BB BF）。
+    //    BOM 拼进 payload 后落在 `#!ra3luabridge` 之后，Lua 4.0 把 EF BB BF 当非法 token
+    //    → 整个节点的 payload 解析失败 → **该节点静默不执行**（游戏里什么都不发生，也没有报错）。
+    //    这里读到 BOM 直接报错拦下，绝不生成坏包。
+    if (text.charCodeAt(0) === 0xFEFF) {
+        throw new Error(
+            `${relPath} 开头有 UTF-8 BOM，会让整个节点的 payload 解析失败（Lua 4.0 不认 EF BB BF）；` +
+            `请存成「UTF-8 无 BOM」：node .dsh-tools/scratch/strip_bom.js`);
+    }
+
     text = text.replace(/\r?\n/g, '\r\n').replace(/(\r\n)+$/, '');
     if (text.indexOf(PAYLOAD_PREFIX) === 0) {
         throw new Error(`${relPath} 里不要自己写 ${PAYLOAD_PREFIX.trim()} 前缀，工具会加`);
@@ -150,12 +242,23 @@ function nodeFiles(node) {
     return node.files || [node.file];
 }
 
+/**
+ * ★ 所有节点都会先拼上这个文件：诊断通道（_LOG / _ALERT / 节点自检）。
+ * 2026-10 实测教训：只走 exAddTextToPublicBoard 的播报整局一条都没显示，
+ * 结果"流程断在哪"完全没法判断。现在统一由 00_alert.lua 三路输出。
+ */
+const SHARED_PRELUDE = ['lua/chouka/00_alert.lua'];
+
+function filesWithPrelude(node) {
+    return SHARED_PRELUDE.concat(nodeFiles(node));
+}
+
 function nodeLabel(node) {
     return (node.files || [node.file]).join(' + ');
 }
 
 function readNodeBody(node) {
-    const bodies = nodeFiles(node).map(readLuaBody);
+    const bodies = filesWithPrelude(node).map(readLuaBody);
     return bodies.join('\r\n\r\n');
 }
 

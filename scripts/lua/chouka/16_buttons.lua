@@ -1,25 +1,8 @@
 -- ============================================================
--- 抽卡hex · 顶部按钮栏 + 交易市场 + 氪金防御塔
---
--- 对应 ScriptsData.json 节点：抽卡hex / 按钮栏
---
--- API 以 教程.lua:284-332 为准：
---   区域可见：exCenterTopBtnsChangeVisibilityForPlayer(playerName, visible)
---   建/改按钮：exCenterTopBtnShowForPlayer(playerName, index, textureName, desc)
---   启用：  exCenterTopBtnSetEnableForPlayer(playerName, index, enable)
---   ⚠ Show 之后要**等 1 或 2 帧**再调其它 ui 函数，所以启用放在下一次求值。
---   点击回调固定名：function onCenterTopBtnClickEvent(playerName, btnIndex)
---
--- 按钮位置（作者定）：1、2 留空，3 = 交易市场，4 = 海克斯，5、6 留空。
---
--- 交易市场两页：
---   第一页：1 购买下一抽卡等级：<价格>   2 购买防御塔   3 关闭
---   第二页：1 购买随机T1防御塔：500     2 …T2：2000
---           3 …T3：5000               4 …T4：10000      5 返回
---
--- 防御塔只落在自己的四个预设点位 tower<玩家号>1~4（点位名 tower11 ~ tower64），
--- 按 1→4 顺序填，一格一塔不可堆叠；没有空位时只给自己发提示。
+-- 详见 docs/10-Lua注释存档.md §16_buttons-1
 -- ============================================================
+
+ChoukaMarkNodeReady("按钮栏")
 
 CHOUKA_BTN_MARKET       = 3
 CHOUKA_BTN_HEXTECH      = 4
@@ -31,6 +14,55 @@ CHOUKA_DIALOG_TOWERS    = 710       -- 710 + 玩家序号 = 防御塔第二页
 
 ChoukaBtnStage = 0
 ChoukaTowerSerial = 0
+
+-- ============================================================
+-- 详见 docs/10-Lua注释存档.md §16_buttons-2
+-- ============================================================
+
+ChoukaChoiceHandlers   = ChoukaChoiceHandlers or {}
+ChoukaLongTextHandlers = ChoukaLongTextHandlers or {}
+
+function ChoukaAddChoiceHandler(f)
+    if type(f) ~= "function" then
+        return
+    end
+    for i = 1, getn(ChoukaChoiceHandlers), 1 do
+        if ChoukaChoiceHandlers[i] == f then
+            return
+        end
+    end
+    tinsert(ChoukaChoiceHandlers, f)
+end
+
+function ChoukaAddLongTextHandler(f)
+    if type(f) ~= "function" then
+        return
+    end
+    for i = 1, getn(ChoukaLongTextHandlers), 1 do
+        if ChoukaLongTextHandlers[i] == f then
+            return
+        end
+    end
+    tinsert(ChoukaLongTextHandlers, f)
+end
+
+function onUserBtnChoiceDialogEvent(playerName, btnIndex, dialogId)
+    for i = 1, getn(ChoukaChoiceHandlers), 1 do
+        if ChoukaChoiceHandlers[i](playerName, btnIndex, dialogId) == 1 then
+            return 1
+        end
+    end
+    return 0
+end
+
+function onUserLongTextDialogEvent(playerName, btnIndex, dialogId)
+    for i = 1, getn(ChoukaLongTextHandlers), 1 do
+        if ChoukaLongTextHandlers[i](playerName, btnIndex, dialogId) == 1 then
+            return 1
+        end
+    end
+    return 0
+end
 
 -- ---------------- 氪金防御塔名单 ----------------
 -- T1 ￥500 / T2 ￥2000 / T3 ￥5000 / T4 ￥10000
@@ -124,7 +156,11 @@ function ChoukaButtonsEnable()
     end
 end
 
-if ChoukaBtnStage == 0 then
+-- ★ 开局门控：房主点过「确认，开始游戏」之后才把顶部按钮栏建出来
+--   （开局公告 / 等待房主配置期间不该露出交易市场，CHOUKA_GAME_STARTED 见 03_start.lua）
+if CHOUKA_GAME_STARTED ~= 1 then
+    ChoukaBtnStage = 0
+elseif ChoukaBtnStage == 0 then
     ChoukaButtonsBuild()
     ChoukaBtnStage = 1
 elseif ChoukaBtnStage == 1 then
@@ -193,45 +229,58 @@ function ChoukaDoBuyLevel(playerName)
     local ok, msg = ChoukaBuyLevel(playerName)
     SetWorldBuilderThisPlayer(previous)
     if ok == 1 then
-        exAddTextToPublicBoard(msg, 6)
+        _ALERT(msg)
     else
         exAddTextToPublicBoardForPlayer(playerName, msg, 6)
     end
     return ok
 end
 
--- 找一个空格子（1~4 顺序），返回序号；全满返回 nil
+-- 占位台账：存**对象句柄**，塔被卖掉/拆掉句柄就失效，格子自动释放
+ChoukaTowerSlotUsed = ChoukaTowerSlotUsed or {}
+
+-- 找一个空格子（1~4 顺序），返回 序号, 航点数组
 function ChoukaFreeTowerSlot(index)
-    if ChoukaTowerSlotFilter == nil then
-        ChoukaTowerSlotFilter = CreateObjectFilter({
-            Rule = "ANY",
-            Include = "STRUCTURE",
-        })
-    end
     for slot = 1, 4, 1 do
-        local waypoint = exWaypointGetPos("tower" .. index .. slot)
-        local occupied = 0
-        if waypoint ~= nil then
-            local x = waypoint[1]
-            local y = waypoint[2]
-            local z = waypoint[3]
-            if x ~= nil then
-                local found, count = ObjectFindObjects(nil,
-                    { X = x, Y = y, Z = z, Radius = 45 }, ChoukaTowerSlotFilter)
-                if count ~= nil and count > 0 then
-                    occupied = 1
-                end
-            else
-                occupied = 1   -- 点位读不出来，当作不可用
-            end
-        else
-            occupied = 1
+        local key = index .. "_" .. slot
+        local used = ChoukaTowerSlotUsed[key]
+        if used ~= nil and not ObjectIsAlive(used) then
+            ChoukaTowerSlotUsed[key] = nil      -- 塔没了，位置腾出来
+            used = nil
         end
-        if occupied == 0 then
-            return slot
+        if used == nil then
+            local waypoint = exWaypointGetPos("tower" .. index .. slot)
+            if waypoint ~= nil and waypoint[1] ~= nil then
+                return slot, waypoint
+            end
         end
     end
-    return nil
+    return nil, nil
+end
+
+-- 照 DSA 市场塔的写法：exCreateObject + FastHash；失败返回 nil
+function ChoukaSpawnTower(playerName, index, towerType, x, y, z)
+    local team = playerName .. "/team" .. playerName
+    local tower = nil
+    if type(exCreateObject) == "function" then
+        local id = exCreateObject({
+            ObjectType = FastHash(towerType),
+            TeamName   = team,
+            Position   = { X = x, Y = y, Z = z },
+            Angle      = 0,
+        })
+        if id ~= nil then
+            tower = GetObjectById(id)
+        end
+    end
+    if tower == nil then
+        ChoukaTowerSerial = ChoukaTowerSerial + 1
+        local name = format("ChoukaTower_%d_%d", index, ChoukaTowerSerial)
+        ExecuteAction("UNIT_SPAWN_NAMED_LOCATION_ORIENTATION", name, towerType, team,
+            { X = x, Y = y, Z = z }, 0)
+        tower = GetObjectByScriptName(name)
+    end
+    return tower
 end
 
 function ChoukaDoBuyTower(playerName, tier)
@@ -249,13 +298,12 @@ function ChoukaDoBuyTower(playerName, tier)
         return 0
     end
 
-    local slot = ChoukaFreeTowerSlot(index)
+    local slot, waypoint = ChoukaFreeTowerSlot(index)
     if slot == nil then
         exAddTextToPublicBoardForPlayer(playerName, "你的 4 个防御塔点位都已被占用", 6)
         return 0
     end
 
-    local waypoint = exWaypointGetPos("tower" .. index .. slot)
     local x, y, z = waypoint[1], waypoint[2], waypoint[3]
     if x == nil then
         exAddTextToPublicBoardForPlayer(playerName, "防御塔点位坐标异常，购买取消", 6)
@@ -271,12 +319,18 @@ function ChoukaDoBuyTower(playerName, tier)
 
     local previous = SetWorldBuilderThisPlayer(1)
     ExecuteAction("PLAYER_GIVE_MONEY", playerName, -price)
-    ChoukaTowerSerial = ChoukaTowerSerial + 1
-    ExecuteAction("UNIT_SPAWN_NAMED_LOCATION_ORIENTATION",
-        format("ChoukaTower_%d_%d_%d", index, slot, ChoukaTowerSerial),
-        towerType,
-        format("%s/team%s", playerName, playerName),
-        { X = x, Y = y, Z = z }, 0)
+    local tower = ChoukaSpawnTower(playerName, index, towerType, x, y, z)
+    if tower == nil then
+        -- 生成失败就退款，别让钱白扣
+        ExecuteAction("PLAYER_GIVE_MONEY", playerName, price)
+        SetWorldBuilderThisPlayer(previous)
+        exAddTextToPublicBoardForPlayer(playerName, "防御塔生成失败（类型名可能不对）", 6)
+        return 0
+    end
+    -- DSA FinishMarketTower 的收尾：免冷冻 + 购买当帧就能开火（不等建造动画）
+    ExecuteAction("UNIT_CHANGE_OBJECT_STATUS", tower, "IN_SHIELD_SPHERE", 1)
+    ExecuteAction("UNIT_CHANGE_OBJECT_STATUS", tower, "UNPACKING", 0)
+    ChoukaTowerSlotUsed[index .. "_" .. slot] = tower
     SetWorldBuilderThisPlayer(previous)
 
     exAddTextToPublicBoardForPlayer(playerName,
@@ -298,15 +352,16 @@ function onCustomBtnClickEvent(playerName, btnIndex)
     onCenterTopBtnClickEvent(playerName, btnIndex)
 end
 
--- 选择对话框回调
-function onUserBtnChoiceDialogEvent(playerName, btnIndex, dialogId)
+-- 选择对话框回调（交易市场两页）。开局配置那个对话框由 03_start.lua 处理，
+-- 这里只认自己的 dialogId，处理完返回 1，其余返回 0 让别的处理函数接手。
+function ChoukaChoice_market(playerName, btnIndex, dialogId)
     if dialogId == nil or btnIndex == nil then
-        return
+        return 0
     end
 
     local index = ChoukaPlayerIndexFromName(playerName)
     if index == nil then
-        return
+        return 0
     end
 
     if dialogId == CHOUKA_DIALOG_MAIN + index then
@@ -315,12 +370,24 @@ function onUserBtnChoiceDialogEvent(playerName, btnIndex, dialogId)
         elseif btnIndex == 2 then
             ChoukaShowTowerDialog(playerName)
         end
+        return 1
     elseif dialogId == CHOUKA_DIALOG_TOWERS + index then
         if btnIndex >= 1 and btnIndex <= 4 then
             ChoukaDoBuyTower(playerName, btnIndex)
-            ChoukaShowTowerDialog(playerName)   -- 买完留在这一页，方便连买
+            -- 买完立即关面板（作者要求）
+            if type(exHideCustomBtnChoiceDialogForPlayer) == "function" then
+                exHideCustomBtnChoiceDialogForPlayer(playerName)
+            end
         elseif btnIndex == 5 then
             ChoukaShowMarketDialog(playerName)
         end
+        return 1
     end
+    return 0
+end
+
+-- ⚠ 只注册一次（脚本每次求值都会造一个新的函数对象，不卡住会让表每秒变长）
+if ChoukaMarketHandlerRegistered ~= 1 then
+    ChoukaMarketHandlerRegistered = 1
+    ChoukaAddChoiceHandler(ChoukaChoice_market)
 end

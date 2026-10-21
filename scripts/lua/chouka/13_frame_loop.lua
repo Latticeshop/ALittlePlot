@@ -1,18 +1,36 @@
 -- ============================================================
--- 抽卡hex · 每帧驱动
---
--- 对应 ScriptsData.json 节点：抽卡hex / 帧循环
---   EvaluationInterval     = 0     （每帧求值）
---   DeactivateUponSuccess  = false （常驻）
---   条件                   = CONDITION_TRUE
---
--- 现在做两件事：
---   ① 消费帧延迟队列（ChoukaDelayCall 排的活）
---   ② 倒数并结算抽卡批次：等 3 帧让引擎那一整批落地，再只删"出生事件收上来的 id"，
---      然后补 1 个卡池单位（不按半径扫场，旧单位不会被误吞）
--- 以后要加每帧逻辑（飘字、单位计数缓存…）也挂这里。
+-- 详见 docs/10-Lua注释存档.md §13_frame_loop-1
 -- ============================================================
 
+-- ① 开局兜底
+ChoukaMarkNodeReady("帧循环")
+
+ChoukaFrameCount = (ChoukaFrameCount or 0) + 1
+if CHOUKA_GAME_STARTED ~= 1 and ChoukaFrameCount > 2700 then
+    CHOUKA_GAME_STARTED = 1
+    ChoukaStartStage = 2
+    if type(ExecuteAction) == "function" then
+        ExecuteAction("LOCK_CAMERA", 0)
+        ExecuteAction("LOCK_CAMERA_SCROLL", 0)
+        ExecuteAction("ENABLE_INPUT")
+        for i = 1, 6, 1 do
+            ExecuteAction("PLAYER_CAMERA_MOVE_TO", "Player_" .. i,
+                "Player_" .. i .. "_Start", 0, 0, 0, 0)
+        end
+    end
+    if type(exHideLongTextDialog) == "function" then
+        exHideLongTextDialog()
+    end
+    if type(exAptShowObjectDetailsArea) == "function" then
+        exAptShowObjectDetailsArea()
+    end
+    if CHOUKA_BOX_SECONDS ~= nil and (CHOUKA_BOX_LEFT == nil or CHOUKA_BOX_LEFT > CHOUKA_BOX_SECONDS) then
+        CHOUKA_BOX_LEFT = CHOUKA_BOX_SECONDS
+    end
+    _ALERT("开局流程超时，已自动放行（请检查 03_start.lua）")
+end
+
+-- ② 帧延迟队列
 if ChoukaFrameTick ~= nil then
     ChoukaFrameTick()
 end
