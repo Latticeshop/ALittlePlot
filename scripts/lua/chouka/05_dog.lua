@@ -147,7 +147,7 @@ function ChoukaSpawnDog(playerIndex)
             ChoukaScriptCreated[actualId] = 1
         end
         ChoukaDogLastSpawnType = dogType
-        _LOG(format("保底工程师：给 Player_%d 投放 %s 位置=(%.0f,%.0f,%.0f)",
+        _LOG(format("保底工程师：给 Player_%d 投放 %s ",
             playerIndex, dogType, x, y, z or 0))
         return 1
     end
@@ -180,7 +180,7 @@ for i = 1, 6, 1 do
                 if ChoukaDogLastSpawnType == "SovietEngineer" then
                     which = "苏联工程师"
                 end
-                local tip = format("你手上没有工程师了，已在你家投放 1 只%s（去碰箱子抽卡）", which)
+                local tip = format(ChoukaT.dogTip, which)
                 if type(exAddTextToPublicBoardForPlayer) == "function" then
                     exAddTextToPublicBoardForPlayer(format("Player_%d", i), tip, 10)
                 else

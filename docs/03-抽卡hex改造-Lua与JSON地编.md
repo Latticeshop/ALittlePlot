@@ -29,7 +29,7 @@
 | `抽卡hex/随机箱清理` | 0（每帧） | ❌ 常驻 | `CONDITION_TRUE` | 照 DSA 的两段删除：第 1 帧删 `GenericCrateSpawner`（刷箱器）→ 第 45 帧清已落地的实体随机箱（离预设点位 80 以内放过）→ 前 2 分钟每 10 秒兜底补扫（docs/07） | `07_crates.lua` |
 | `抽卡hex/初始化` | 0（每帧） | ✅ 成功即自我停用 | `CONDITION_TRUE` | 抽卡等级表、全图常亮、基础电力、关闭建造栏、开局资金**兜底** 5096、倒计时初值 | `09_level.lua` + `00_init.lua` |
 | `抽卡hex/收入` | 1（≈1 秒） | ❌ 常驻 | `CONDITION_TRUE` | 底薪 + 油井加成，顺手重设电力（**开局后才结算**） | `01_income.lua` |
-| `抽卡hex/私有箱` | 1（≈1 秒，**自己数秒**） | ❌ 常驻 | `CONDITION_TRUE` | 每秒把 `CHOUKA_BOX_LEFT` 减 1，减到 0 才开新回合：每人两个点位各刷一个金钱箱（已有箱子就跳过）+ 重置倒计时 + 回合数 +1（**开局后才走**） | `02_private_box.lua` |
+| `抽卡hex/私有箱` | 1（≈1 秒，**自己数秒**） | ❌ 常驻 | `CONDITION_TRUE` | 每秒把 `CHOUKA_BOX_LEFT` 减 1，减到 0 才开新回合：每人两个点位各刷一个箱子（种类见 `02a_crate_list.lua`，已有箱子就跳过）+ 重置倒计时 + 回合数 +1（**开局后才走**） | `02_private_box.lua` |
 | `抽卡hex/抽卡初始化` | 0（每帧） | ✅ 成功即自我停用 | `CONDITION_TRUE` | 截获原版抽卡结果并转成卡池单位：**原生结果几个就补几个**（单抽 1 / 十连 10，上限 10），按阵营池 + 水陆筛选（docs/08 §2、§5） | `10_puredraw_data.lua` + `gen_pool.lua` + `11_puredraw_hook.lua` + `12_puredraw_replace.lua` |
 | `抽卡hex/保底军犬` | 1（≈1 秒） | ❌ 常驻 | `CONDITION_TRUE` | **只看玩家手上有没有苏联/盟军工程师**：为 0 时每 5 秒在「起重机→出生点 55% 处」补 1 个，有就一只都不多刷。补的种类是 **SovietEngineer / AlliedEngineer 随机**（随机取千分位奇偶 + **最多连续 2 次同一种**，保证两种都会出现；作者实测反馈过"只见到盟军工程师"）。这两种不会作为原生抽卡结果出现，所以不会被自己的抽卡系统误删；日志会打 `保底工程师：给 Player_N 投放 <类型>` | `05_dog.lua` |
 | `抽卡hex/中央油井` | 1（≈1 秒） | ❌ 常驻 | `CONDITION_TRUE` | 中央两座油井（真名 `centerOil1`/`centerOil2`，拿不到才按离 `center` 250 内的 `OilDerrick` 兜底）：每 5 秒扫半径 200 按玩家计数，**连续领先 3 次**才换归属并真实转所有权；每回合在 `center1~6` 各刷 1 个钱箱（点位已有箱子就跳过）（docs/08 §1、§3） | `06_center.lua` |
@@ -56,10 +56,12 @@ ALittlePlot/
 ├─ scripts/
 │  ├─ lua/chouka/00_alert.lua          ← 真源：**诊断通道**（_LOG / _ALERT / 节点自检；构建时拼到每个节点最前面）
 │  ├─ lua/chouka/00_selfcheck.lua      ← 真源：**自检心跳**（每 10 秒一行日志，排第一个节点）
+│  ├─ lua/chouka/01_texts.lua           ← **文案总表**（所有玩家可见文本 + 日志文案，tools/extract-texts.js 生成）
 │  ├─ lua/chouka/03_start.lua           ← 真源：**开局流程**（锁视角+公告+房主配置+正式开始，docs/06）
 │  ├─ lua/chouka/07_crates.lua          ← 真源：**引擎随机箱清理**（除预设点位外不出现自然随机箱，docs/07）
 │  ├─ lua/chouka/00_init.lua            ← 真源：地图级一次性别（视野/电力/禁建造/资金兜底/倒计时初值）
 │  ├─ lua/chouka/01_income.lua          ← 真源：收入
+│  ├─ lua/chouka/02a_crate_list.lua     ← **箱子种类表**（家里 boxN1/2 + 中央 center1~6 刷什么箱子，改权重只改这）
 │  ├─ lua/chouka/02_private_box.lua     ← 真源：私有箱（含去重 + 回合数自增，1 秒节点自己数秒）
 │  ├─ lua/chouka/09_level.lua           ← 真源：抽卡等级表（等级 → 各档概率 / 升级价）
 │  ├─ lua/chouka/05_dog.lua             ← 真源：保底单位（工程师，节点名仍叫"保底军犬"）
@@ -83,7 +85,10 @@ ALittlePlot/
    ├─ pool-alias.js                     ← 中文名→类型名 的简称对照表
    ├─ build-upgrades.js                 ← 科技协议名单生成器（读双兵种 / DSA 三处清单）
    ├─ build-watermask.js                ← 从地图预览图提取"海/陆"死数据 → 09a_watermask.lua
-   └─ extract-comments.js               ← 把 lua 里的大段纯注释搬到 docs/10-Lua注释存档.md
+   ├─ extract-comments.js               ← 把 lua 里的大段纯注释搬到 docs/10-Lua注释存档.md
+   ├─ extract-texts.js                   ← 把 lua 里**玩家可见**的大段文本串搬到 chouka/01_texts.lua（只追加，跳过 _LOG）
+   ├─ split-log-texts.js                  ← 反向：把"其实只进 _LOG"的条目搬回代码（文案表只留玩家看得见的）
+   └─ lua-callsite.js                     ← 上面两个共用的"这个字符串被哪个函数包着"判定（认得出跨行 _LOG(format(...))）
 ```
 
 ```powershell
@@ -93,6 +98,8 @@ node tools/build-upgrades.js            # 重建科技协议名单 → gen_upgra
 node tools/sync-scriptsdata.js          # 生成 scripts/ScriptsData.json
 node tools/sync-scriptsdata.js --check  # 只算 payload 体积，不写文件
 node tools/extract-comments.js          # 把 lua 里 ≥4 行的纯注释搬到 docs/10（含代码指纹校验）
+node tools/extract-texts.js             # 把**玩家可见**的大段文本串追加进 01_texts.lua（_LOG 里的自动跳过）
+node tools/split-log-texts.js           # 反过来：把只进日志的条目搬回代码
 ```
 
 当前产物（16 个节点，全部远低于 64 KB 单条上限；每个节点都自动多拼了 `00_alert.lua`）：
@@ -161,12 +168,15 @@ node tools/extract-comments.js          # 把 lua 里 ≥4 行的纯注释搬到
 | 开局资金 | `00_init.lua` 的 `BASE_MONEY` | `PLAYER_GIVE_MONEY` 是**在**酒馆初始资金上叠加 |
 | 基础电力 | 两个文件的 `BASE_POWER` | 给到 100000 已经远远超过任何建筑消耗 |
 | 箱子间隔 | `02_private_box.lua` 的 `BOX_SECONDS` | 节点 interval 自动跟随；`00_init.lua` 里同名常量只影响倒计时显示，一起改 |
-| 箱子类型 | `02_private_box.lua` 的 `CRATE_TYPE` | `moneycrate` = 金钱箱；`unitcratenew` = 单位箱（盲盒高原用法） |
+| 登神盲盒半径 / 幅度 | `02_private_box.lua` 的 `CHOUKA_ASCEND_RADIUS` / `CHOUKA_ASCEND_MIN` / `CHOUKA_ASCEND_MAX` | 96 世界单位（= 家里 box11↔box12 间距 95.5）/ 25%~50%；种类概率 血量40 伤害30 攻速20 射程10（docs/07 §5.1）|
+| 箱子类型 / 权重 | `02a_crate_list.lua` 的 `CHOUKA_CENTER_CRATE_TABLE`（中央）/ `CHOUKA_BOX_CRATE_TABLE`（家里） | 中央：现金 45/大现金 5/治疗 10/经验 10/神秘 10/部队 5/属性 15；家里：现金 45/大现金 15/经验 10/神秘 10/部队 5/属性 15（治疗箱只在中央）；写 0 就关掉那种（docs/07 §5）|
 | 卡池内容 / 各档权重 | 别手改 `gen_pool.lua`（生成物）；改 `tools/build-pool.js` | 权重合计必须是 100 |
 | 截获后等几帧再结算 | `10_puredraw_data.lua` 的 `CHOUKA_BATCH_FRAMES` | 引擎同帧出一整批，等太少只收到第一个 |
 | 自定义抽卡概率 | `10_puredraw_data.lua` 的 `CHOUKA_CUSTOM_CHANCE` | 100 = 全部自定义（当前）；调小就是"有概率保留原版结果" |
 | 左下角两行文字 | `20_hud.lua` 顶部 `CHOUKA_HUD_TEXT_X` / `CHOUKA_HUD_ROUND_Y` / `CHOUKA_HUD_COUNTDOWN_Y` / `*_COLOR` / `CHOUKA_HUD_TEXT_SIZE` | `AlignY="bottom"` 时 Y 从底边往上量；颜色是十进制 RGB（黄 `16776960`、橙 `16744448`） |
 | 卡池内容 / 阵营归属 / 水陆类别 | 别手改 `gen_pool.lua`；改 `tools/build-pool.js`（`USER_POOL` 作者清单、`AMPHIBIOUS` 两栖名单、`TIER_WEIGHTS` 权重）和 `tools/pool-alias.js`（中文名→类型名） | 改完跑 `node tools/build-pool.js && node tools/sync-scriptsdata.js`，生成器会把没翻译出来的名字全部打印出来 |
+| 对玩家显示的文本 | **集中在 `scripts/lua/chouka/01_texts.lua`（`ChoukaT` 表，35 条）**，代码里只写 `ChoukaT.<key>` | 它被拼进**每个节点**的 payload 公共前缀（和 `00_alert.lua` 一样），任何节点都能直接用 |
+| 日志文案（`_LOG`） | **就地写在业务代码里，不进文案表** | 作者要求"玩家的"和"开发的"分开，混在一起不好认（docs/08 §7.6） |
 | lua 里的注释 | 只写 1~3 行的短注释指路；**超过 3 行的纯说明搬到 `docs/10-Lua注释存档.md`** | payload 是把 lua 原文逐字节拼进 JSON 的，注释一样占节点体积（单节点上限 64 KB）。跑 `node tools/extract-comments.js` 自动搬（会校验代码指纹，误删代码会直接中止） |
 | 抽卡剔除哪些单位 | `tools/build-pool.js` 的 `BLACKLIST` | 默认剔除基地车/矿车/工程师等"不能打架"的单位；**四家基地车全都不进 T1~T4** |
 | 只在某一档出现的单位 | `tools/build-pool.js` 的 `TIER_PIN` | 现在只有一条：`CelestialMCV`（青龙战斗核心舰，本质是 T5 单位）只留在 **T5**，以前它跟着「各国基地车」被塞进神州 T1，导致抽卡会抽到基地车 |
@@ -290,14 +300,33 @@ node tools/extract-comments.js          # 把 lua 里 ≥4 行的纯注释搬到
 ### 9.2 抽卡等级 / 概率 / 交易市场
 
 - **等级表**在 `09_level.lua`：等级 1~8，每级一张概率表（`ChoukaLevelWeights`）、
-  升级价格（`ChoukaLevelPrice`：1000 / 2000 / 3000 / 5000 / 5000 / 10000 / 10000）、
-  自动升级回合（`ChoukaAutoLevelRound`：第 5 / 10 / 15 / 20 回合 → Lv.2 / 3 / 4 / 5）。
+  升级价格（`ChoukaLevelPrice`：**Lv1 开局自带 / 1000 / 2000 / 5000 / 10000 / 20000 / 50000 / 50000**，作者 2026-10 定稿）、
+  自动升级回合（`ChoukaAutoLevelRound`：第 5 / 10 / 15 / 20 回合 → Lv.2 / 3 / 4 / 5；Lv6~8 只能买）。
+  概率表（T1~T5，%）：
+  Lv1 100/0/0/0/0、Lv2 90/10、Lv3 75/25、Lv4 55/30/15、Lv5 45/33/20/2、
+  Lv6 30/40/25/5、Lv7 16/30/43/10/1、Lv8 15/20/34/30/1。
 - 抽卡时 `ChoukaChooseUnit` 先按**当前等级的概率表**掷档，再档内均匀取，再按阵营 + 水陆收窄。
 - **等级是全场共用的一个进度**（这张图只有 6 个小格，做成公共进度；任何人买都会推进全场）。
 - **交易市场**（顶部按钮 3）里两项：`购买等级`（按 `ChoukaLevelPrice` 扣钱升级）、
-  `购买防御塔`（`CHOUKA_TOWER_PRICE` 扣钱，在自己起重机位置生成 `CHOUKA_TOWER_TYPE`）。
+  `购买防御塔`（`ChoukaTowerPriceByTier` 扣钱：**T1 ￥500 / T2 ￥2000 / T3 ￥7500 / T4 ￥20000**，
+  在自家 `towerN1~towerN4` 生成随机塔；塔池见 `16_buttons.lua` 的 `ChoukaTowerPoolByTier`）。
+- **【已关闭·备用】购买神州机场1200**：代码整套留着，开关是 `16_buttons.lua` 的
+  `CHOUKA_AIRPORT_ENABLED`（默认 **0 = 不显示入口**）。关闭原因（作者实测后定）：
+  ① 本图没禁用空军建造栏 → 机场能直接造飞机，不符合"抽卡出单位"的设计；
+  ② 飞机弹药已由「每回合自动补满弹药」解决（见 §9.3），不需要机场了。
+  想重开就把它改成 1 —— 入口、购买流程、六条文案、占位判定都还是现成的
+  （`CHOUKA_AIRPORT_PRICE` = 1200，在自家 `airportN` 航点生成 `CelestialAirfield`）。
+  机场有三道闸：**没这个航点** → 提示补航点；**点位上已有神州机场**（台账 + 按类型名 `ObjectFindObjects` 扫 200 半径）
+  → 拒绝、不扣钱；**钱不够** → 提示。生成失败自动退款（和防御塔同一套写法）。
   扣钱用 `PLAYER_GIVE_MONEY` 的**负值**（动作表里没有 TAKE_MONEY，GIVE 的中文说明就是"增加或减少"）；
   余额用 `exPlayerGetCurrentMoney` 查。
+- **建筑怎么生成**（照 `DSA_ggz自走棋/lua/GAME/GiveFreeStructure__2.lua` 的现成写法）：
+  ````lua
+  ExecuteAction("CREATE_NAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION",
+      "ChoukaAirport_1_1", "CelestialAirfield", "Player_1/teamPlayer_1", "airport1", -3.1415926/4)
+  ````
+  生成前用 `GetNextObjectId()` 先把这个 id 记进 `ChoukaScriptCreated`，免得新建筑触发
+  `onUnitCreateEvent` 被抽卡系统当成"原版结果"拦走（和 `ChoukaTrySpawnOne` 同一套防呆）。
 - **按钮栏 API**（以 `教程.lua:284-332` 为准，**不是** DSA 内部那套名字）：
   `exCenterTopBtnsChangeVisibilityForPlayer(玩家, 1)` 开区域、
   `exCenterTopBtnShowForPlayer(玩家, 序号, textureName, desc)`、
@@ -308,6 +337,44 @@ node tools/extract-comments.js          # 把 lua 里 ≥4 行的纯注释搬到
   对话框 `exShowCustomBtnChoiceDialogForPlayer(玩家, 对话框ID, 标题, 选项1..7)`（**固定 10 个参数**，
   用 `call(函数, {参数表})` 传）、选择回调 `onUserBtnChoiceDialogEvent(playerName, btnIndex, dialogId)`。
   图标 ID：交易市场 `Button_PlayerPower_FreeTrade`、海克斯 `Button_SovietChiefScientist`。
+
+### 9.3 每回合给飞机补满弹药（`02_private_box.lua`）
+
+作者要求：**每回合开始给所有飞机补满弹药，不要播报**（播报太多会刷屏，所以只写日志）。
+
+- 时机：`02_private_box.lua` 的回合推进里，刷完箱子 + 播报「第 N 回合开始」**之后**调 `ChoukaRefillAircraftAmmo()`。
+  放在最后是有意的：这个接口万一报错，也挡不住上面已经做完的刷箱、回合数 +1 和播报。
+- 接口（《日冕 Lua.lua》[[34]]「获取以及设置单位武器的弹药量」）：
+
+  ````lua
+  -- 参数：单位, WeaponSlot 的 ID, 武器 Ordering, 该 Ordering 里的武器序号
+  ObjectGetWeaponSetUpdateWeaponMaxAmmoCount(obj, slot, ord, idx)      -- 最大弹药量
+  ObjectSetWeaponSetUpdateWeaponCurrentAmmoCount(obj, slot, ord, idx, n) -- 设成 n
+  ````
+
+  Ordering：`PRIMARY=1 SECONDARY=2 TERTIARY=3 QUATERNARY=4 QUINARY=5`；
+  ⚠ **「WeaponSlot 的 ID」不是槽位序号**。按《日冕 Lua.lua》的维护者轰炸机例子，飞机武器都在 `ID=1` 的槽里、
+  同一 Ordering 下有 6 个武器（序号 1~6），所以默认扫：槽 1~2 × Ordering 1~5 × 序号 1~6。
+- 找飞机：`CreateObjectFilter({ Rule="ANY", Relationship="ENEMIES NEUTRAL ALLIES", Include="AIRCRAFT" })`
+  + `ObjectFindObjects(nil, { X=0,Y=0,Z=0, Radius=20000, DistType="EXTENTS_3D" }, 过滤器)`，一次抓全图。
+  抄的是《LUA封装宝典》`SetAmmoForUnits` / 日冕 BUFF 的 `IncludeThing` 用法。
+- 补法：先取**最大弹药量**，`> 0` 才把当前弹药设成最大值（没有弹药概念的武器/挂点直接跳过）。
+  **不猜固定数值**——写死一个 999 会让只有 2 发的轰炸机能连投 999 颗。
+- 调参（都在 `02_private_box.lua` 开头）：
+
+| 常量 | 默认 | 含义 |
+|---|---|---|
+| `CHOUKA_AMMO_REFILL` | 1 | 1 = 每回合补满；改 0 整个关掉 |
+| `CHOUKA_AMMO_SLOTS` | 2 | 扫几个 WeaponSlot（ID 1~2；飞机一般只用 1）|
+| `CHOUKA_AMMO_ORDERS` | 5 | PRIMARY~QUINARY |
+| `CHOUKA_AMMO_INDEX` | 6 | 每个 Ordering 里最多几个武器 |
+| `CHOUKA_AMMO_RADIUS` | 20000 | 找飞机的半径（够包住整张图）|
+
+- 日志（只在日志文件，不进游戏界面）：`补弹药：第3回合，飞机 4 架，补满武器 8 处`；
+  场上没飞机时写 `补弹药：第3回合，场上没有飞机`；mod 没这个函数时写一行"跳过"。
+- 未实测点：`Include="AIRCRAFT"` 与 `ObjectGetWeaponSetUpdateWeaponMaxAmmoCount` 在**本 mod 版本**下是否都可用。
+  如果日志里一直写"场上没有飞机"但其实有飞机在飞 → 说明过滤器没匹配上，改成 `IncludeThing = { 具体飞机类型名 }` 列表；
+  如果日志里出现 Lua 报错 → 把报错发我，说明该 mod 的 WeaponSetUpdate 组件接口不一样。
 
 ### 9.4 HUD
 

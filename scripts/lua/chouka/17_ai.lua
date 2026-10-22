@@ -67,7 +67,7 @@ if ChoukaAIAIProbeWorks == nil and type(EvaluateCondition) == "function" then
         end
     end
     if CHOUKA_AI_DEBUG == 1 and ChoukaAIAIProbeWorks == 0 then
-        _ALERT("AI对手：人格参数\"AI\"不可用，改用\"非人类 + 有起重机 + 有钱\"判定电脑")
+        _ALERT(ChoukaT.aiPersona)
     end
 end
 
@@ -113,7 +113,7 @@ function ChoukaAIIsComputer(index)
     ChoukaAIIsComputerCache[index] = verdict
     if verdict == 1 and CHOUKA_AI_DEBUG == 1 and ChoukaAIReportedAI[index] ~= 1 then
         ChoukaAIReportedAI[index] = 1
-        _ALERT(format("AI对手：Player_%d 是电脑，将每回合自动抽 1 个单位", index))
+        _ALERT(format(ChoukaT.aiDetected, index))
     end
     return verdict
 end
@@ -153,6 +153,11 @@ function ChoukaAIDrawOne(index)
     local slot = mod(ChoukaAIDrawSerial, 6) + 1
     local unit = ChoukaSpawnUnit(playerName, x, y, z, onWater, slot, 6, level)
     if unit ~= nil then
+        -- 记一行坐标：万一"某人家门口多一个"，一眼能看出是不是电脑抽卡刷到了人类座位上
+        if CHOUKA_DRAW_LOG == 1 then
+            _LOG(format("AI抽卡 玩家=%s 位置=(%.0f,%.0f,%.0f) 水陆=%d Lv.%d",
+                playerName, x, y, z or 0, onWater, level))
+        end
         return 1
     end
     return 0
@@ -195,7 +200,7 @@ if CHOUKA_AI_AUTO_DRAW == 1 and aiRoundChanged then
         end
     end
     if drawnCount > 0 and CHOUKA_AI_DEBUG == 1 then
-        _ALERT(format("AI对手：第%d回合，每个电脑抽 %d 个（合计 %d 个，概率按 Lv.%d）",
+        _ALERT(format(ChoukaT.aiDrawInfo,
             CHOUKA_ROUND, perSeat, drawnCount, ChoukaAutoLevelForRound(CHOUKA_ROUND)))
     end
 end
@@ -300,7 +305,7 @@ if CHOUKA_AI_JOIN_NEUTRAL == 1 or CHOUKA_AI_FORCE_PLAYER_ATTACK == 1 then
     if ChoukaAIScanTick == 1 or mod(ChoukaAIScanTick, CHOUKA_AI_SCAN_SECONDS) == 0 then
         local joinedCount = ChoukaAIScanUnits()
         if joinedCount > 0 and CHOUKA_AI_DEBUG == 1 then
-            _ALERT(format("AI攻击队列：%d 个非玩家阵营单位已加入攻击队", joinedCount))
+            _ALERT(format(ChoukaT.aiAttackQueue, joinedCount))
         end
     end
 end

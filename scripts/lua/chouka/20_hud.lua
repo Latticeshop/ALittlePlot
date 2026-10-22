@@ -87,7 +87,7 @@ function ChoukaHudInitScoreBoard()
     end
     exScoreBoardSetVisibility(1)
     if type(exScoreBoardSetTitle) == "function" then
-        exScoreBoardSetTitle("抽卡hex · 场上单位")
+        exScoreBoardSetTitle(ChoukaT.hudTitle)
     end
     for i = 1, 6, 1 do
         exScoreBoardSetText(format("$p%dName:", i), i, 1)
@@ -193,7 +193,7 @@ for i = 1, 6, 1 do
     if isHuman == 1 and ChoukaHudCreateForPlayer(i) == 1 then
         local playerName = "Player_" .. i
         ChoukaHudUpdateText(playerName, CHOUKA_HUD_ROUND_INDEX, format("回合数：%d", hudRound))
-        ChoukaHudUpdateText(playerName, CHOUKA_HUD_COUNTDOWN_INDEX, "盲盒刷新倒计时：" .. hudCountdownText)
+        ChoukaHudUpdateText(playerName, CHOUKA_HUD_COUNTDOWN_INDEX, ChoukaT.hudCountdown .. hudCountdownText)
         ChoukaHudUpdateText(playerName, CHOUKA_HUD_LEVEL_INDEX, format("抽卡等级：Lv.%d", hudLevel))
         ChoukaHudUpdateText(playerName, CHOUKA_HUD_PROB1_INDEX, hudProbText)
     end

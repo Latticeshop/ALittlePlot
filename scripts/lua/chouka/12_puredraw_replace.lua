@@ -95,34 +95,83 @@ function ChoukaDist2(ax, ay, bx, by)
     return dx * dx + dy * dy
 end
 
+-- 落点是否可用：读不到、或恰好 (0,0)（地图左下角 = 引擎的"没有坐标"）都算无效。
+-- ★ 这就是"家里起重机旁边偶尔多一个结果"的病根：
+--   运兵车里的乘客、刚创建还没摆到场上的单位，ObjectGetPosition 会返回 0,0（或在创建事件里
+--   ObjectIsAlive 还是假 → ChoukaAddToBatch 只能存 0,0）。这种单位以前会自己单独成一群
+--   → 结算时坐标无效 → 退回**起重机位置**生成 → 家里凭空多一个。
+function ChoukaPosOk(x, y)
+    if x == nil or y == nil then
+        return 0
+    end
+    if x == 0 and y == 0 then
+        return 0
+    end
+    return 1
+end
+
 function ChoukaGroupBatch(batch)
     local groups = {}
+    local pending = {}          -- 落点读不到的单位（先记着，等有群了再挂进去）
     local n = getn(batch.ids)
     for i = 1, n, 1 do
         local x = batch.px[i]
         local y = batch.py[i]
         local target = nil
-        for k = 1, getn(groups), 1 do
-            local cand = groups[k]
-            if x ~= nil and y ~= nil and cand.x ~= nil
-                and ChoukaDist2(x, y, cand.x, cand.y)
-                    <= CHOUKA_GROUP_RADIUS * CHOUKA_GROUP_RADIUS then
-                target = cand
-                break
+        if ChoukaPosOk(x, y) == 1 then
+            for k = 1, getn(groups), 1 do
+                local cand = groups[k]
+                if cand.posOk == 1 and cand.x ~= nil and cand.y ~= nil
+                    and ChoukaDist2(x, y, cand.x, cand.y)
+                        <= CHOUKA_GROUP_RADIUS * CHOUKA_GROUP_RADIUS then
+                    target = cand
+                    break
+                end
+            end
+            if target == nil then
+                target = { ids = {}, hashes = {}, x = x, y = y, z = batch.pz[i],
+                           nativeWater = 0, nativeAir = 0, posOk = 1 }
+                tinsert(groups, target)
+            end
+        else
+            -- 落点读不到：并进**最近创建的那一群**（同一只箱子吐出来的"车 + 车里的乘客"），
+            -- 不单独算一次结果；一个群都还没有就先攒着
+            if getn(groups) > 0 then
+                target = groups[getn(groups)]
+            else
+                tinsert(pending, i)
             end
         end
-        if target == nil then
-            target = { ids = {}, hashes = {}, x = x, y = y, z = batch.pz[i],
-                       nativeWater = 0, nativeAir = 0 }
-            tinsert(groups, target)
+        if target ~= nil then
+            tinsert(target.ids, batch.ids[i])
+            tinsert(target.hashes, batch.hashes[i])
         end
-        tinsert(target.ids, batch.ids[i])
-        tinsert(target.hashes, batch.hashes[i])
+    end
+
+    -- 整批都没有可用落点（极端情况）：攒成一群并标 posOk=0，结算时直接作废、不再往家里塞
+    if getn(pending) > 0 then
+        local host = nil
+        if getn(groups) > 0 then
+            host = groups[1]
+        else
+            host = { ids = {}, hashes = {}, x = 0, y = 0, z = 0,
+                     nativeWater = 0, nativeAir = 0, posOk = 0 }
+            tinsert(groups, host)
+        end
+        for k = 1, getn(pending), 1 do
+            local i = pending[k]
+            tinsert(host.ids, batch.ids[i])
+            tinsert(host.hashes, batch.hashes[i])
+        end
+    end
+
+    -- 批级水陆信号对每一群都算数
+    for k = 1, getn(groups), 1 do
         if batch.nativeWater == 1 then
-            target.nativeWater = 1
+            groups[k].nativeWater = 1
         end
         if batch.nativeAir == 1 then
-            target.nativeAir = 1
+            groups[k].nativeAir = 1
         end
     end
     return groups
@@ -232,6 +281,12 @@ function ChoukaResolveBatch(playerName, batch)
     -- ③ 每组补 1 个卡池单位（水陆按组各自判）
     for k = 1, groupCount, 1 do
         local group = groups[k]
+        if group ~= nil and group.posOk == 0 then
+            -- 整批落点都读不到：**不补单位**（以前会退回起重机位置，看起来像"家里白送一个"）
+            _LOG(format("抽卡作废 玩家=%s 原生=%d个 落点读不到（整批都没有有效坐标），不补单位",
+                playerName, getn(group.ids)))
+            group = nil
+        end
         if group ~= nil then
             local onWater = ChoukaDecideWater(group)
             -- ★ 只按判定的地形抽。**绝不在这一层"换另一类地形再试"**：
@@ -569,15 +624,20 @@ function ChoukaTrySpawnOne(playerName, unitType, x, y, z)
 end
 
 function ChoukaSpawnUnit(playerName, x, y, z, onWater, slot, total, level)
-    -- 坐标无效（读不到 / 落到 0,0 就是地图左下角）时退回自己起重机的位置
+    -- ★ 不再"坐标无效就退回起重机位置"：那会在自家起重机旁凭空多一个单位（作者实测到的问题）。
+    --   现在一律当失败处理，只写日志，让问题暴露出来（读不到落点在上游已经并群/作废了）。
     if x == nil or y == nil or (x == 0 and y == 0) then
-        local index = tonumber(strsub(playerName or "Player_1", 8)) or 1
-        local crane = GetObjectByScriptName(ChoukaCranePrefix .. index)
-        local cx, cy, cz = ObjectGetPosition(crane)
-        if cx ~= nil then
-            x, y, z = cx, cy, cz
+        local xs = "nil"
+        if x ~= nil then
+            xs = "" .. x
         end
-        onWater = 0                     -- 起重机在自家岛上，是陆地
+        local ys = "nil"
+        if y ~= nil then
+            ys = "" .. y
+        end
+        _LOG(format("抽卡生成跳过 玩家=%s 坐标无效=(%s,%s)，不再退回起重机位置",
+            playerName, xs, ys))
+        return nil
     end
 
     -- 水陆：调用方（结算）已经判好就照用；没给就现场按同一个方法判一次

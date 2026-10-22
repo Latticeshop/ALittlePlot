@@ -20,15 +20,16 @@ ChoukaLevelWeights = {
     [8] = { 15, 20, 34, 30, 1 },
 }
 
--- 升到第 N 级的价格（键 = 目标等级）
+-- 升到第 N 级的价格（键 = 目标等级；作者 2026-10 定稿）
+--   Lv1 开局自带 / 1000 / 2000 / 5000 / 10000 / 20000 / 50000 / 50000
 ChoukaLevelPrice = {
-    [2] = 500,
-    [3] = 1000,
-    [4] = 2000,
-    [5] = 3000,
-    [6] = 5000,
-    [7] = 10000,
-    [8] = 10000,
+    [2] = 1000,
+    [3] = 2000,
+    [4] = 5000,
+    [5] = 10000,
+    [6] = 20000,
+    [7] = 50000,
+    [8] = 50000,
 }
 
 -- 第几个回合结束后自动升到该级（键 = 目标等级）
@@ -61,7 +62,7 @@ function ChoukaAutoLevelTick(round)
         -- 只在"当前等级更低"时升级，绝不把已经买上去的等级压下来
         if round >= atRound and ChoukaDrawLevel < level then
             ChoukaDrawLevel = level
-            _ALERT(format("抽卡等级已自动升为%d级", level))
+            _ALERT(format(ChoukaT.levelAutoUp, level))
         end
     end
 end
@@ -71,16 +72,16 @@ function ChoukaBuyLevel(playerName)
     local nextLevel = ChoukaDrawLevel + 1
     local price = ChoukaGetLevelPrice(nextLevel)
     if price == nil then
-        return 0, format("抽卡等级已满（Lv.%d）", ChoukaDrawLevel)
+        return 0, format(ChoukaT.levelMax, ChoukaDrawLevel)
     end
     local money = exPlayerGetCurrentMoney(playerName)
     if money == nil then
         money = 0
     end
     if money < price then
-        return 0, format("金币不足：升到 Lv.%d 需要 %d", nextLevel, price)
+        return 0, format(ChoukaT.levelNoMoney, nextLevel, price)
     end
     ExecuteAction("PLAYER_GIVE_MONEY", playerName, -price)
     ChoukaDrawLevel = nextLevel
-    return 1, format("抽卡等级提升到 Lv.%d", ChoukaDrawLevel)
+    return 1, format(ChoukaT.levelUp, ChoukaDrawLevel)
 end

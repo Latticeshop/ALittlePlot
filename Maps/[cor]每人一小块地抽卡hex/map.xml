@@ -116,6 +116,48 @@
 	<GameMap
 		id="corhex">
 		<Waypoint
+			id="airport2">
+			<Position
+				x="5200.329287"
+				y="1722.637226"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="airport3">
+			<Position
+				x="3052.737606"
+				y="326.18096"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="airport4">
+			<Position
+				x="891.308648"
+				y="1692.116423"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="airport5">
+			<Position
+				x="887.435127"
+				y="4465.260062"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="airport6">
+			<Position
+				x="3050.314241"
+				y="5785.039261"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
+			id="airport1">
+			<Position
+				x="5217.5232"
+				y="4454.367685"
+				z="0"/>
+		</Waypoint>
+		<Waypoint
 			id="tower33">
 			<Position
 				x="3303.292261"

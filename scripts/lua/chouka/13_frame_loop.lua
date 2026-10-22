@@ -27,7 +27,7 @@ if CHOUKA_GAME_STARTED ~= 1 and ChoukaFrameCount > 2700 then
     if CHOUKA_BOX_SECONDS ~= nil and (CHOUKA_BOX_LEFT == nil or CHOUKA_BOX_LEFT > CHOUKA_BOX_SECONDS) then
         CHOUKA_BOX_LEFT = CHOUKA_BOX_SECONDS
     end
-    _ALERT("开局流程超时，已自动放行（请检查 03_start.lua）")
+    _ALERT(ChoukaT.frameTimeout)
 end
 
 -- ② 帧延迟队列

@@ -10,23 +10,19 @@ CHOUKA_START_ANNOUNCE_DIALOG = 810      -- 全屏公告的长文本对话框 id
 CHOUKA_START_HOST_DIALOG     = 811      -- 房主配置的按钮对话框 id
 
 CHOUKA_START_CENTER_WP       = "center" -- 锁视角的中心航点（本图中心点就叫 center）
-CHOUKA_START_WAIT_TEXT       = "请等待房主选择配置"
+CHOUKA_START_WAIT_TEXT       = ChoukaT.waitHost
 CHOUKA_START_TEXT_Z_OFFSET   = 80       -- 中心提示文字的抬高量（世界单位）
 CHOUKA_START_TEXT_COLOR      = 16776960 -- 0xFFFF00 亮黄（十进制 RGB）
 CHOUKA_START_CAMERA_PERIOD   = 3        -- 每 N 次求值重新钉一次视角（秒）
 CHOUKA_START_LOCK_INPUT      = 0        -- 1 = 开局期间 DISABLE_INPUT（照 DSA）；见文件头说明
 CHOUKA_BOX_SECONDS           = CHOUKA_BOX_SECONDS or 120  -- 盲盒刷新间隔，02_private_box 共用
 
-CHOUKA_START_ANNOUNCE_TEXT =
-    "作者：格格子\n" ..
-    "欢迎来到小块地抽卡hex！本地图有一套自定义抽卡系统，玩家使用日冕空投箱子抽卡获取单位，抢夺资源，击败其他玩家的起重机获取胜利！\n" ..
-    "抽卡等级系统：抽卡单位严格按照当前抽卡等级，玩家可以花钱升级解锁更高科技单位的概率。\n" ..
-    "购买防御塔：玩家可以在市场购买随机防御塔守护家园，最多四座！"
+CHOUKA_START_ANNOUNCE_TEXT = ChoukaT.announce
 
 -- 详见 docs/10-Lua注释存档.md §03_start-2
 ChoukaStartScopeOptions = ChoukaStartScopeOptions or {
-    [1] = { scope = 0, name = "箱子包括全部阵营" },
-    [2] = { scope = 1, name = "抽卡只有自己阵营" },
+    [1] = { scope = 0, name = ChoukaT.scopeAll },
+    [2] = { scope = 1, name = ChoukaT.scopeOwn },
 }
 
 -- ---------------- 状态（必须是全局：Lua 桥的闭包拿不到外层 local） ----------------
@@ -161,6 +157,21 @@ function ChoukaStartTellPlayer(playerName, text, seconds)
     _LOG(text)          -- 只写日志（开局节点在关键路径上，不冒险调未验证的可见通道），见 00_alert.lua
 end
 
+-- 全图播报一条：左下角消息区（实测能看到）+ 公屏（能否显示看 mod 版本）+ 日志
+-- ⚠ 只在关键动作**之后**调用：可见通道万一报错，也挡不住开局的发钱/开门这些正事
+function ChoukaStartBroadcast(text, seconds)
+    if seconds == nil then
+        seconds = 15
+    end
+    _LOG(text)
+    if type(exMessageAppendToMessageArea) == "function" then
+        exMessageAppendToMessageArea(text)
+    end
+    if type(exAddTextToPublicBoard) == "function" then
+        exAddTextToPublicBoard(text, seconds)
+    end
+end
+
 -- 只给房主开的选择对话框（固定 10 个参数，照 16_buttons.lua 的 call 写法）
 function ChoukaStartShowDialog(playerName, dialogId, title, choices)
     if type(exShowCustomBtnChoiceDialogForPlayer) ~= "function" then
@@ -195,7 +206,7 @@ end
 function ChoukaStartShowHostDialog(playerName)
     local choices = ChoukaStartHostChoices()
     ChoukaStartShowDialog(playerName, CHOUKA_START_HOST_DIALOG,
-        "房主配置 · 抽卡hex", choices)
+        ChoukaT.hostDialogTitle, choices)
 end
 
 -- ============================================================
@@ -222,8 +233,10 @@ function ChoukaStartBegin()
 
     -- 全屏公告（长文本对话框：按钮传空串就隐藏，只留「已阅读」）
     if type(exShowLongTextDialog) == "function" then
+        -- 按钮槽位：1=左 2=中 3=右；空串=不显示那个按钮。
+        -- 只给第 1 个槽位按钮 → 实测靠左；放到中间槽位才是居中（照 DSA）
         exShowLongTextDialog(CHOUKA_START_ANNOUNCE_DIALOG, CHOUKA_START_ANNOUNCE_TEXT,
-            "已阅读", "", "")
+            "", ChoukaT.readDone, "")
     end
 
     -- 地图中间的等待提示 + 公屏
@@ -290,13 +303,12 @@ function ChoukaStartFinish()
         exHideCustomBtnChoiceDialogForPlayer(ChoukaStartHost)
     end
 
-    local scopeText = "全部阵营"
+    -- 全图公告：房主到底选了什么（所有人都会在左下角消息区看到）
+    local scopeText = ChoukaT.scopeAll
     if CHOUKA_DRAW_SCOPE == 1 then
-        scopeText = "只有自己阵营"
+        scopeText = ChoukaT.scopeOwn
     end
-    _LOG(format(
-        "房主完成配置，游戏开始！抽卡范围：%s；第一轮盲盒将在 %d 秒后刷新。",
-        scopeText, CHOUKA_BOX_SECONDS))
+    ChoukaStartBroadcast(format(ChoukaT.hostConfigDone, scopeText, CHOUKA_BOX_SECONDS), 20)
 end
 
 -- ============================================================
@@ -315,7 +327,7 @@ function ChoukaLongText_start(playerName, btnIndex, dialogId)
     if playerName == ChoukaStartHost then
         ChoukaStartShowHostDialog(playerName)
         ChoukaStartTellPlayer(playerName,
-            "你是房主：请在窗口里选好配置，然后点「确认，开始游戏」", 20)
+            ChoukaT.hostTip, 20)
     else
         ChoukaStartTellPlayer(playerName, CHOUKA_START_WAIT_TEXT, 20)
     end
@@ -338,6 +350,11 @@ function ChoukaChoice_start(playerName, btnIndex, dialogId)
 
     if btnIndex >= 1 and btnIndex <= optionCount then
         ChoukaStartScopeKey = btnIndex
+        -- 房主每点一次选项，全图播一条（照 DSA：让所有人知道房主正在选什么）
+        local picked = ChoukaStartScopeOptions[btnIndex]
+        if picked ~= nil and picked.name ~= nil then
+            ChoukaStartBroadcast(format(ChoukaT.hostPicking, picked.name), 8)
+        end
         -- 选择对话框点一下就自动消失，所以重开一遍把 √ 标出来
         ChoukaStartShowHostDialog(playerName)
         return 1
@@ -352,7 +369,7 @@ function ChoukaChoice_start(playerName, btnIndex, dialogId)
     if btnIndex == rereadBtn then
         if type(exShowLongTextDialogForPlayer) == "function" then
             exShowLongTextDialogForPlayer(playerName, CHOUKA_START_ANNOUNCE_DIALOG,
-                CHOUKA_START_ANNOUNCE_TEXT, "已阅读", "", "")
+                CHOUKA_START_ANNOUNCE_TEXT, "", ChoukaT.readDone, "")
         end
         return 1
     end

@@ -21,10 +21,12 @@ ALittlePlot/
 │     ├─ map.xml / overrides.xml
 │     └─ map.str / map.ini              仍是模板原件，待重做（缺 SCRIPT:box）
 ├─ scripts/
+│  ├─ lua/chouka/01_texts.lua           ← **文案总表**：只放玩家看得见的 35 条（日志文案就地写在各自代码里）
 │  ├─ lua/chouka/03_start.lua           ← **开局流程**：锁视角 + 全屏公告 + 房主配置 + 正式开始（照 DSA，无运镜）
 │  ├─ lua/chouka/07_crates.lua          ← **引擎随机箱清理**：除预设点位外，场上不出现自然随机箱（照 DSA）
 │  ├─ lua/chouka/00_init.lua            ← 真源：地图级一次性别（全图视野/无限电/禁止建造/资金兜底/倒计时初值）
 │  ├─ lua/chouka/01_income.lua          ← 真源：底薪 + 油井加成（开局后才结算）
+│  ├─ lua/chouka/02a_crate_list.lua     ← **箱子种类表**：家里/中央刷什么箱子（权重表，改这一处）
 │  ├─ lua/chouka/02_private_box.lua     ← 真源：每人两个私有箱子点（1 秒节点自己数秒，开局后才走）
 │  ├─ lua/chouka/09_level.lua           ← 真源：抽卡等级表（等级 → 各档概率 / 升级价 / 自动升级回合）
 │  ├─ lua/chouka/05_dog.lua             ← 真源：保底单位（工程师，节点名仍叫"保底军犬"）
@@ -58,8 +60,14 @@ ALittlePlot/
    ├─ sync-scriptsdata.js       lua/** → ScriptsData.json 的生成器（零依赖 node；读到 UTF-8 BOM 直接报错拦下）
    ├─ build-watermask.js        地图预览图（蓝色=海）→ chouka/09a_watermask.lua 水陆掩码（零依赖 node）
    ├─ import-dsa-pool.js        从 DSA 的 PureDraw/02_data.lua 导入卡池（零依赖 node）
-   └─ extract-comments.js       lua 里 ≥4 行的大段纯注释 → docs/10（带代码指纹校验，误删会中止）
+   ├─ extract-comments.js       lua 里 ≥4 行的大段纯注释 → docs/10（带代码指纹校验，误删会中止）
+   ├─ extract-texts.js          lua 里**玩家可见**的大段文本串 → chouka/01_texts.lua（只追加，跳过 _LOG）
+   ├─ split-log-texts.js         反向：只进日志的条目搬回代码
+   └─ lua-callsite.js            上面两个共用的"被哪个函数包着"判定
 
+> ⚠ **玩家可见的文字别写死在业务代码里**：放 `scripts/lua/chouka/01_texts.lua`（`ChoukaT`），
+> 新写的玩家文案跑一次 `node tools/extract-texts.js` 自动追加过去；`_LOG` 日志文案则**就地写**，不要进文案表（docs/08 §7.6）。
+>
 > ⚠ lua 里的注释**也占节点体积**（payload 是 lua 原文逐字节拼的，上限 64 KB）：纯说明性注释最多写 3 行，
 > 更长的跑 `node tools/extract-comments.js` 搬到 `docs/10-Lua注释存档.md`（docs/08 §7.4）。
 >

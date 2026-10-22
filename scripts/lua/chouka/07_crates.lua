@@ -149,7 +149,7 @@ elseif ChoukaCrateTick == CHOUKA_CRATE_SECOND_TICK then
     local removed = ChoukaCrateSweep()
     ChoukaCrateSweptTotal = ChoukaCrateSweptTotal + removed
     if removed > 0 then
-        _ALERT(format("已清除 %d 个引擎随机箱子（本图只在预设点位刷箱）", removed))
+        _ALERT(format(ChoukaT.crateCleaned, removed))
     end
 elseif ChoukaCrateTick > CHOUKA_CRATE_SECOND_TICK
     and ChoukaCrateTick <= CHOUKA_CRATE_SWEEP_UNTIL

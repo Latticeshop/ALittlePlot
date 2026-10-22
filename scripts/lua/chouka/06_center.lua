@@ -43,13 +43,17 @@ if CHOUKA_ROUND ~= nil and ChoukaCenterCrateRound ~= CHOUKA_ROUND
             if oilOwner ~= nil and oilOwner > 0 then
                 ownerIndex = oilOwner
             end
-            ExecuteAction("CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT", "moneycrate",
-                format("Player_%d/teamPlayer_%d", ownerIndex, ownerIndex), wp)
+            local crateTeam = format("Player_%d/teamPlayer_%d", ownerIndex, ownerIndex)
+            if type(ChoukaSpawnBoxCrate) == "function" then
+                ChoukaSpawnBoxCrate(crateTeam, wp, "center")
+            else
+                ExecuteAction("CREATE_UNNAMED_ON_TEAM_AT_WAYPOINT", "moneycrate", crateTeam, wp)
+            end
             spawnedCrates = spawnedCrates + 1
         end
     end
     if CHOUKA_CENTER_DEBUG == 1 then
-        _ALERT(format("中央钱箱：第%d回合刷了%d个/6个点位", CHOUKA_ROUND, spawnedCrates))
+        _ALERT(format(ChoukaT.centerCrateRefreshed, CHOUKA_ROUND, spawnedCrates))
     end
 end
 
@@ -150,7 +154,7 @@ if CHOUKA_CENTER_DEBUG == 1 and ChoukaCenterOilReported ~= 1 then
             py = floor(oy)
         end
     end
-    _ALERT("中央油井定位：1号=" .. t1 .. " 2号=" .. t2 .. " 1号坐标=(" .. px .. "," .. py .. ")")
+    _ALERT(ChoukaT.centerOilLocate .. t1 .. " 2号=" .. t2 .. " 1号坐标=(" .. px .. "," .. py .. ")")
 end
 
 -- ============================================================
@@ -270,7 +274,7 @@ function ChoukaCenterTickCapture(k, oil, leadIndex)
         if oil ~= nil and ObjectIsAlive(oil) then
             ExecuteAction("NAMED_TRANSFER_OWNERSHIP_PLAYER", oil, "Player_" .. leadIndex)
         end
-        _ALERT(format("中央油井%d 被 Player_%d 占领！", k, leadIndex))
+        _ALERT(format(ChoukaT.centerOilCaptured, k, leadIndex))
     end
 end
 
@@ -289,7 +293,7 @@ if doCapture then
                     if ChoukaCenterOilLead[k] ~= leadIndex
                         or mod(ChoukaCenterTickCount, CHOUKA_CENTER_REPORT) == 0 then
                         ChoukaCenterOilLead[k] = leadIndex
-                        _ALERT(format("中央油井%d 领先=%d 进度=%d 归属=%d 计数=%s",
+                        _ALERT(format(ChoukaT.centerOilProgress,
                             k, leadIndex, ChoukaCenterOilScore[k],
                             ChoukaCenterOilOwner[k], ChoukaCenterCountsText(counts)))
                     end

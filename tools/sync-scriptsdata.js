@@ -54,7 +54,7 @@ const NODES = [
     },
     {
         // ★ 引擎随机箱清理：照 DSA PureDraw/06_init_mcv.lua:43-79 的两段延迟删除，
-        //   除了 02_private_box / 06_center 在预设点位刷的箱子，场上不出现任何自然随机箱。
+        //   除了 02_private_box / 06_center 在预设点位刷的箱子（种类见 02a_crate_list.lua），场上不出现任何自然随机箱。
         //   每帧节点 + 自己的帧计数（1 帧删生成器 → 45 帧清已落地的实体箱 → 前 2 分钟每 10 秒兜底）。
         //   不能一次性停用，否则 45 帧那一遍跑不到。
         file: 'lua/chouka/07_crates.lua',
@@ -85,7 +85,11 @@ const NODES = [
         // 私有箱：**每秒节点自己数秒**（原来 interval 直接吃 BOX_SECONDS=120）。
         // 原因见 02_private_box.lua 文件头：节点间隔从进游戏算起，和"房主确认开局"
         // 那个时间点对不齐，改成每秒节点 + 自己数 CHOUKA_BOX_LEFT 才准。
-        file: 'lua/chouka/02_private_box.lua',
+        // 02a = 箱子种类表（家里 boxN1/2 + 中央 center1~6 共用），必须先于 02_private_box
+        files: [
+            'lua/chouka/02a_crate_list.lua',
+            'lua/chouka/02_private_box.lua',
+        ],
         folder: '抽卡hex',
         name: '私有箱',
         evaluationInterval: 1,
@@ -247,7 +251,10 @@ function nodeFiles(node) {
  * 2026-10 实测教训：只走 exAddTextToPublicBoard 的播报整局一条都没显示，
  * 结果"流程断在哪"完全没法判断。现在统一由 00_alert.lua 三路输出。
  */
-const SHARED_PRELUDE = ['lua/chouka/00_alert.lua'];
+const SHARED_PRELUDE = [
+    'lua/chouka/00_alert.lua',
+    'lua/chouka/01_texts.lua',   // 文案总表（所有对玩家显示的文本 + 日志文案都在这一个文件里）
+];
 
 function filesWithPrelude(node) {
     return SHARED_PRELUDE.concat(nodeFiles(node));

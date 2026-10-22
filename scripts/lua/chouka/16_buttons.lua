@@ -12,6 +12,13 @@ CHOUKA_BTN_ICON_HEXTECH = "Button_SovietChiefScientist"
 CHOUKA_DIALOG_MAIN      = 700       -- 700 + 玩家序号 = 交易市场第一页
 CHOUKA_DIALOG_TOWERS    = 710       -- 710 + 玩家序号 = 防御塔第二页
 
+CHOUKA_AIRPORT_ENABLED  = 0                          -- 0 = 不显示购买入口（备用）；1 = 打开
+CHOUKA_AIRPORT_TYPE     = "CelestialAirfield"        -- 神州机场的类型名（DSA GiveFreeStructure__2.lua 同款）
+CHOUKA_AIRPORT_PRICE    = 1200
+CHOUKA_AIRPORT_WP       = "airport"                  -- 航点：airport1 ~ airport6（一个座位一个）
+CHOUKA_AIRPORT_ANGLE    = -3.1415926 / 4             -- 朝向（照 DSA 的 -45°）
+CHOUKA_AIRPORT_RADIUS   = 200                        -- 判断"点位上已经有机场了"的搜索半径
+
 ChoukaBtnStage = 0
 ChoukaTowerSerial = 0
 
@@ -65,13 +72,13 @@ function onUserLongTextDialogEvent(playerName, btnIndex, dialogId)
 end
 
 -- ---------------- 氪金防御塔名单 ----------------
--- T1 ￥500 / T2 ￥2000 / T3 ￥5000 / T4 ￥10000
+-- T1 ￥500 / T2 ￥2000 / T3 ￥7500 / T4 ￥20000（作者 2026-10 定稿）
 -- 类型名全部对应 日冕 真实地编ID（来源：巨人城 ThingEnum.lua、DSA 市场塔、原版目录）
 ChoukaTowerPriceByTier = {
     [1] = 500,
     [2] = 2000,
-    [3] = 5000,
-    [4] = 10000,
+    [3] = 7500,
+    [4] = 20000,
 }
 
 ChoukaTowerPoolByTier = {
@@ -142,9 +149,9 @@ function ChoukaButtonsBuild()
         local playerName = "Player_" .. i
         ChoukaBtnVisibility(playerName, 1)
         ChoukaBtnShow(playerName, CHOUKA_BTN_MARKET, CHOUKA_BTN_ICON_MARKET,
-            "交易市场\n购买等级 / 购买防御塔")
+            ChoukaT.btnMarket)
         ChoukaBtnShow(playerName, CHOUKA_BTN_HEXTECH, CHOUKA_BTN_ICON_HEXTECH,
-            "海克斯\n本图暂未启用")
+            ChoukaT.btnHextech)
     end
 end
 
@@ -196,16 +203,22 @@ function ChoukaShowMarketDialog(playerName)
         nextPrice = ChoukaGetLevelPrice(level + 1)
     end
 
-    local levelText = "购买下一抽卡等级：已满级"
+    local levelText = ChoukaT.btnLevelMax
     if nextPrice ~= nil then
-        levelText = format("购买下一抽卡等级：%d", nextPrice)
+        levelText = format(ChoukaT.btnLevelPrice, nextPrice)
     end
 
-    ChoukaShowDialog(playerName, CHOUKA_DIALOG_MAIN + index, "交易市场", {
+    -- ★ 神州机场这一项暂时关掉（CHOUKA_AIRPORT_ENABLED = 0），选项表按需要拼，别写死序号：
+    --   关掉时 1=购买等级 2=购买防御塔 3=关闭；打开时 1=等级 2=防御塔 3=神州机场 4=关闭
+    local choices = {
         levelText,
         "购买防御塔",
-        "关闭",
-    })
+    }
+    if CHOUKA_AIRPORT_ENABLED == 1 then
+        tinsert(choices, format(ChoukaT.btnAirportPrice, CHOUKA_AIRPORT_PRICE))
+    end
+    tinsert(choices, "关闭")
+    ChoukaShowDialog(playerName, CHOUKA_DIALOG_MAIN + index, "交易市场", choices)
 end
 
 -- 第二页：防御塔
@@ -216,7 +229,7 @@ function ChoukaShowTowerDialog(playerName)
     end
     local choices = {}
     for tier = 1, 4, 1 do
-        choices[tier] = format("购买随机T%d防御塔：%d", tier, ChoukaTowerPriceByTier[tier])
+        choices[tier] = format(ChoukaT.btnTowerPrice, tier, ChoukaTowerPriceByTier[tier])
     end
     choices[5] = "返回"
     ChoukaShowDialog(playerName, CHOUKA_DIALOG_TOWERS + index, "购买防御塔", choices)
@@ -294,19 +307,19 @@ function ChoukaDoBuyTower(playerName, tier)
     local money = exPlayerGetCurrentMoney(playerName) or 0
     if money < price then
         exAddTextToPublicBoardForPlayer(playerName,
-            format("金币不足：T%d防御塔需要 %d", tier, price), 6)
+            format(ChoukaT.btnTowerNoMoney, tier, price), 6)
         return 0
     end
 
     local slot, waypoint = ChoukaFreeTowerSlot(index)
     if slot == nil then
-        exAddTextToPublicBoardForPlayer(playerName, "你的 4 个防御塔点位都已被占用", 6)
+        exAddTextToPublicBoardForPlayer(playerName, ChoukaT.towerSlotsFull, 6)
         return 0
     end
 
     local x, y, z = waypoint[1], waypoint[2], waypoint[3]
     if x == nil then
-        exAddTextToPublicBoardForPlayer(playerName, "防御塔点位坐标异常，购买取消", 6)
+        exAddTextToPublicBoardForPlayer(playerName, ChoukaT.towerBadPos, 6)
         return 0
     end
 
@@ -324,7 +337,7 @@ function ChoukaDoBuyTower(playerName, tier)
         -- 生成失败就退款，别让钱白扣
         ExecuteAction("PLAYER_GIVE_MONEY", playerName, price)
         SetWorldBuilderThisPlayer(previous)
-        exAddTextToPublicBoardForPlayer(playerName, "防御塔生成失败（类型名可能不对）", 6)
+        exAddTextToPublicBoardForPlayer(playerName, ChoukaT.towerSpawnFail, 6)
         return 0
     end
     -- DSA FinishMarketTower 的收尾：免冷冻 + 购买当帧就能开火（不等建造动画）
@@ -334,7 +347,154 @@ function ChoukaDoBuyTower(playerName, tier)
     SetWorldBuilderThisPlayer(previous)
 
     exAddTextToPublicBoardForPlayer(playerName,
-        format("已在 %d 号点位购买 T%d 防御塔（-%d）", slot, tier, price), 6)
+        format(ChoukaT.towerBought, slot, tier, price), 6)
+    return 1
+end
+
+-- ---------------- 购买神州机场 ----------------
+
+-- 台账：存机场的对象句柄（机场被拆了句柄失效，就允许重新买）
+ChoukaAirportUsed = ChoukaAirportUsed or {}
+
+-- 自己的机场点位（airport1 ~ airport6），没有这个航点就返回 nil
+function ChoukaAirportPoint(index)
+    if type(exWaypointGetPos) ~= "function" then
+        return nil
+    end
+    local wp = exWaypointGetPos(CHOUKA_AIRPORT_WP .. index)
+    if wp == nil or wp[1] == nil then
+        return nil
+    end
+    return wp[1], wp[2], wp[3]
+end
+
+-- 点位上已经有神州机场了吗？
+--  ① 先看台账（自己买过的），② 再按类型在点位附近扫一遍结构（防止重进游戏/别人手放）
+function ChoukaAirportExists(index, x, y, z)
+    local used = ChoukaAirportUsed[index]
+    if used ~= nil then
+        if ObjectIsAlive(used) then
+            return 1
+        end
+        ChoukaAirportUsed[index] = nil         -- 机场没了，点位腾出来
+    end
+
+    if type(ObjectFindObjects) ~= "function" then
+        return 0
+    end
+    -- 按"类型名"扫（IncludeThing，照 DSA / 日冕 BUFF 的写法）
+    if ChoukaAirportFilter == nil then
+        ChoukaAirportFilter = CreateObjectFilter({
+            Rule = "ANY",
+            IncludeThing = { CHOUKA_AIRPORT_TYPE },
+        })
+    end
+    local objs, count = ObjectFindObjects(nil, {
+        X = x, Y = y, Z = z or 0,
+        Radius = CHOUKA_AIRPORT_RADIUS,
+        DistType = "CENTER_2D",
+    }, ChoukaAirportFilter)
+    if count ~= nil and count > 0 then
+        for i = 1, count, 1 do
+            local obj = objs[i]
+            if obj ~= nil and ObjectIsAlive(obj) then
+                ChoukaAirportUsed[index] = obj       -- 顺手记进台账
+                _LOG(format("机场检查 玩家=Player_%d 点位上已有神州机场（扫到 %d 座），不能重复买",
+                    index, count))
+                return 1
+            end
+        end
+    end
+    return 0
+end
+
+-- 生成一座神州机场（照 DSA GiveFreeStructure__2.lua：CREATE_NAMED...+航点）
+-- 先登记 ChoukaScriptCreated，免得被抽卡系统当成"原版结果"拦走
+function ChoukaSpawnAirport(playerName, index, x, y, z)
+    ChoukaAirportSerial = (ChoukaAirportSerial or 0) + 1
+    local objName = format("ChoukaAirport_%d_%d", index, ChoukaAirportSerial)
+    local nextId = GetNextObjectId()
+    ChoukaScriptCreated[nextId] = 1
+
+    ExecuteAction("CREATE_NAMED_ON_TEAM_AT_WAYPOINT_WITH_ORIENTATION",
+        objName, CHOUKA_AIRPORT_TYPE,
+        format("%s/team%s", playerName, playerName),
+        CHOUKA_AIRPORT_WP .. index, CHOUKA_AIRPORT_ANGLE)
+
+    local obj = GetObjectByScriptName(objName)
+    if ObjectIsAlive(obj) then
+        local actualId = ObjectGetId(obj)
+        if actualId ~= nextId then
+            ChoukaScriptCreated[nextId] = nil
+            ChoukaScriptCreated[actualId] = 1
+        end
+        return obj
+    end
+    ChoukaScriptCreated[nextId] = nil
+
+    -- 航点方式失败就退回 exCreateObject（和防御塔同一套兜底）
+    if type(exCreateObject) == "function" then
+        local id2 = exCreateObject({
+            ObjectType = FastHash(CHOUKA_AIRPORT_TYPE),
+            TeamName   = format("%s/team%s", playerName, playerName),
+            Position   = { X = x, Y = y, Z = z },
+            Angle      = CHOUKA_AIRPORT_ANGLE,
+        })
+        if id2 ~= nil then
+            ChoukaScriptCreated[id2] = 1
+            local obj2 = GetObjectById(id2)
+            if ObjectIsAlive(obj2) then
+                return obj2
+            end
+            ChoukaScriptCreated[id2] = nil
+        end
+    end
+    return nil
+end
+
+function ChoukaDoBuyAirport(playerName)
+    local index = ChoukaPlayerIndexFromName(playerName)
+    if index == nil then
+        return 0
+    end
+
+    local x, y, z = ChoukaAirportPoint(index)
+    if x == nil then
+        exAddTextToPublicBoardForPlayer(playerName, ChoukaT.airportNoPoint, 6)
+        return 0
+    end
+
+    if ChoukaAirportExists(index, x, y, z) == 1 then
+        exAddTextToPublicBoardForPlayer(playerName, ChoukaT.airportExists, 6)
+        return 0
+    end
+
+    local price = CHOUKA_AIRPORT_PRICE
+    local money = exPlayerGetCurrentMoney(playerName) or 0
+    if money < price then
+        exAddTextToPublicBoardForPlayer(playerName,
+            format(ChoukaT.airportNoMoney, price), 6)
+        return 0
+    end
+
+    local previous = SetWorldBuilderThisPlayer(1)
+    ExecuteAction("PLAYER_GIVE_MONEY", playerName, -price)
+    local building = ChoukaSpawnAirport(playerName, index, x, y, z)
+    if building == nil then
+        ExecuteAction("PLAYER_GIVE_MONEY", playerName, price)   -- 生成失败就退款
+        SetWorldBuilderThisPlayer(previous)
+        exAddTextToPublicBoardForPlayer(playerName, ChoukaT.airportSpawnFail, 6)
+        return 0
+    end
+
+    -- 和防御塔一样收尾：免冷冻 + 购买当帧就是"已建成"（不等建造动画）
+    ExecuteAction("UNIT_CHANGE_OBJECT_STATUS", building, "IN_SHIELD_SPHERE", 1)
+    ExecuteAction("UNIT_CHANGE_OBJECT_STATUS", building, "UNPACKING", 0)
+    ChoukaAirportUsed[index] = building
+    SetWorldBuilderThisPlayer(previous)
+
+    exAddTextToPublicBoardForPlayer(playerName,
+        format(ChoukaT.airportBought, price), 6)
     return 1
 end
 
@@ -369,6 +529,9 @@ function ChoukaChoice_market(playerName, btnIndex, dialogId)
             ChoukaDoBuyLevel(playerName)
         elseif btnIndex == 2 then
             ChoukaShowTowerDialog(playerName)
+        elseif btnIndex == 3 and CHOUKA_AIRPORT_ENABLED == 1 then
+            -- 神州机场（备用）：开关关着时这一格是"关闭"，什么都不做
+            ChoukaDoBuyAirport(playerName)
         end
         return 1
     elseif dialogId == CHOUKA_DIALOG_TOWERS + index then
