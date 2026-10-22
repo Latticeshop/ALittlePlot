@@ -161,7 +161,8 @@ function ChoukaSpawnDog(playerIndex)
 end
 
 -- ★ 开局门控：房主点过「确认，开始游戏」之后才补（CHOUKA_GAME_STARTED 见 03_start.lua）
-if CHOUKA_GAME_STARTED ~= 1 then
+--   三国杀模式结算之后同样停手（CHOUKA_BANG_ENDED 由 33_bang_win.lua 置 1）
+if CHOUKA_GAME_STARTED ~= 1 or CHOUKA_BANG_ENDED == 1 then
     return
 end
 

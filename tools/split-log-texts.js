@@ -16,7 +16,7 @@ const callsite = require('./lua-callsite.js');
 
 const ROOT = path.resolve(__dirname, '..');
 const LUA_DIR = path.join(ROOT, 'scripts', 'lua', 'chouka');
-const TEXTS = path.join(LUA_DIR, '01_texts.lua');
+const TEXTS = path.join(LUA_DIR, '00_core', '01_texts.lua');
 const DRY = process.argv.indexOf('--dry') >= 0;
 
 // 手工点名：虽然外层不是 _LOG，但实质上只进日志
@@ -59,7 +59,22 @@ const RENAME = {
     hud5: 'hudCountdown',
 };
 
-const files = fs.readdirSync(LUA_DIR).filter(f => f.endsWith('.lua') && f !== '01_texts.lua');
+/** 递归列出 chouka 下所有 lua（已按职责分 9 个子目录）；返回 { rel, name } */
+function listLuaFiles(dir, prefix) {
+    const out = [];
+    const entries = fs.readdirSync(dir, { withFileTypes: true })
+        .sort((a, b) => a.name.localeCompare(b.name));
+    for (const ent of entries) {
+        const rel = prefix ? prefix + '/' + ent.name : ent.name;
+        if (ent.isDirectory()) out.push(...listLuaFiles(path.join(dir, ent.name), rel));
+        else if (ent.name.endsWith('.lua')) out.push({ rel, name: ent.name });
+    }
+    return out;
+}
+
+const files = listLuaFiles(LUA_DIR, '')
+    .filter(x => x.name !== '01_texts.lua')
+    .map(x => x.rel);
 
 // ---------- ① 解析 01_texts.lua ----------
 const textSrc = fs.readFileSync(TEXTS, 'utf8').replace(/\r\n/g, '\n');

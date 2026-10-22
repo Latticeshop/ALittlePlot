@@ -34,7 +34,7 @@ const NODES = [
         // ★ 自检 / 心跳：必须排第一。整局每 10 秒往日志写一行
         //   （CoronaData/Logs/EnhancerCorona-*.dll.log），说明"脚本还活着、开局门控过了没、
         //   回合/倒计时在不在动、哪些节点真的跑起来了"。前面任何节点报错都不影响它。
-        file: 'lua/chouka/00_selfcheck.lua',
+        file: 'lua/chouka/10_boot/00_selfcheck.lua',
         folder: '抽卡hex',
         name: '自检',
         evaluationInterval: 1,
@@ -46,7 +46,7 @@ const NODES = [
         //   的分发器，后面的「按钮栏」节点只往分发器里注册自己的处理函数。
         //   常驻（不一次性停用）：回调函数要靠它每秒重新定义一次。
         //   CHOUKA_GAME_STARTED 是全场开局门控，收入/盲盒/军犬/中央/按钮都看它。
-        file: 'lua/chouka/03_start.lua',
+        file: 'lua/chouka/10_boot/03_start.lua',
         folder: '抽卡hex',
         name: '开局',
         evaluationInterval: 1,       // 一秒节点：等待期重钉视角、重刷中心提示
@@ -57,7 +57,7 @@ const NODES = [
         //   除了 02_private_box / 06_center 在预设点位刷的箱子（种类见 02a_crate_list.lua），场上不出现任何自然随机箱。
         //   每帧节点 + 自己的帧计数（1 帧删生成器 → 45 帧清已落地的实体箱 → 前 2 分钟每 10 秒兜底）。
         //   不能一次性停用，否则 45 帧那一遍跑不到。
-        file: 'lua/chouka/07_crates.lua',
+        file: 'lua/chouka/40_draw/07_crates.lua',
         folder: '抽卡hex',
         name: '随机箱清理',
         evaluationInterval: 0,       // 每帧
@@ -66,8 +66,8 @@ const NODES = [
     {
         // 初始化节点：抽卡等级表要先于一切（交易市场按钮、HUD、抽卡都用它）
         files: [
-            'lua/chouka/09_level.lua',
-            'lua/chouka/00_init.lua',
+            'lua/chouka/20_economy/09_level.lua',
+            'lua/chouka/30_world/00_init.lua',
         ],
         folder: '抽卡hex',
         name: '初始化',
@@ -75,7 +75,7 @@ const NODES = [
         deactivateUponSuccess: true, // 成功一次即自我停用
     },
     {
-        file: 'lua/chouka/01_income.lua',
+        file: 'lua/chouka/20_economy/01_income.lua',
         folder: '抽卡hex',
         name: '收入',
         evaluationInterval: 1,      // 约 1 秒一次
@@ -87,8 +87,8 @@ const NODES = [
         // 那个时间点对不齐，改成每秒节点 + 自己数 CHOUKA_BOX_LEFT 才准。
         // 02a = 箱子种类表（家里 boxN1/2 + 中央 center1~6 共用），必须先于 02_private_box
         files: [
-            'lua/chouka/02a_crate_list.lua',
-            'lua/chouka/02_private_box.lua',
+            'lua/chouka/40_draw/02a_crate_list.lua',
+            'lua/chouka/40_draw/02_private_box.lua',
         ],
         folder: '抽卡hex',
         name: '私有箱',
@@ -100,8 +100,8 @@ const NODES = [
         // 必须在任何单位出生前跑完，所以排在初始化后面、抽卡初始化前面。
         // 只跑一次（deactivateUponSuccess），但 onUnitCreateEvent 是全局函数，登记与它都常驻。
         files: [
-            'lua/chouka/gen_allunits.lua',
-            'lua/chouka/11a_register.lua',
+            'lua/chouka/90_gen/gen_allunits.lua',
+            'lua/chouka/40_draw/11a_register.lua',
         ],
         folder: '抽卡hex',
         name: '单位登记',
@@ -111,10 +111,10 @@ const NODES = [
     {
         // 抽卡系统：数据 → 卡池 → 替换/帧队列，拼成一次性初始化
         files: [
-            'lua/chouka/09a_watermask.lua',      // 地图掩码（从地图预览图提取的海陆），必须先于判定脚本
-    'lua/chouka/10_puredraw_data.lua',
-            'lua/chouka/gen_pool.lua',
-            'lua/chouka/12_puredraw_replace.lua',
+            'lua/chouka/90_gen/09a_watermask.lua',      // 地图掩码（从地图预览图提取的海陆），必须先于判定脚本
+    'lua/chouka/40_draw/10_puredraw_data.lua',
+            'lua/chouka/90_gen/gen_pool.lua',
+            'lua/chouka/40_draw/12_puredraw_replace.lua',
         ],
         folder: '抽卡hex',
         name: '抽卡初始化',
@@ -124,16 +124,26 @@ const NODES = [
     {
         // 保底军犬 + 中央油井：放在"抽卡初始化"之后，才能用上卡池表与 CHOUKA_ROUND。
         // 拆成两个节点，一边出错不会把另一边也带死。
-        file: 'lua/chouka/05_dog.lua',
+        file: 'lua/chouka/30_world/05_dog.lua',
         folder: '抽卡hex',
         name: '保底军犬',
         evaluationInterval: 1,
         deactivateUponSuccess: false,
     },
     {
-        file: 'lua/chouka/06_center.lua',
+        file: 'lua/chouka/30_world/06_center.lua',
         folder: '抽卡hex',
         name: '中央油井',
+        evaluationInterval: 1,
+        deactivateUponSuccess: false,
+    },
+    {
+        // 油井重建：中央油井 / 玩家油井"被清场带走"之后，原地重生中立无敌井 + 占领给钱。
+        // 依赖 06_center.lua 的 ChoukaCenterLeader（同为一秒节点，用到时已定义好）；
+        // 它反过来会把重建出来的中央油井写回 ChoukaCenterOilObj，让 06_center 的占点逻辑无缝接管。
+        file: 'lua/chouka/30_world/08_oilfield.lua',
+        folder: '抽卡hex',
+        name: '油井重建',
         evaluationInterval: 1,
         deactivateUponSuccess: false,
     },
@@ -142,8 +152,8 @@ const NODES = [
         // 名单 = 双兵种 Tech_Upgrade + Enhanced_Tech_Upgrade + DSA upgrades + UpgradeEnum 全量，
         // 含龙船（青龙战斗核心舰）全套升级。
         files: [
-            'lua/chouka/gen_upgrades.lua',
-            'lua/chouka/15_upgrades.lua',
+            'lua/chouka/90_gen/gen_upgrades.lua',
+            'lua/chouka/20_economy/15_upgrades.lua',
         ],
         folder: '抽卡hex',
         name: '解锁科技',
@@ -155,7 +165,7 @@ const NODES = [
         // 第 0 帧玩家的科技/技能表可能还没就绪，晚一秒更稳（DSA 也是等建筑发放时才发）。
         // ★ 不能一次性停用 —— 房主确认开局之后才发技能（脚本内部门控 CHOUKA_GAME_STARTED），
         //   而节点从进游戏 1 秒就开始求值，一次性会在"还没开局"时就自我停用。
-        file: 'lua/chouka/14_grant_draw.lua',
+        file: 'lua/chouka/10_boot/14_grant_draw.lua',
         folder: '抽卡hex',
         name: '发技能',
         evaluationInterval: 1,
@@ -165,7 +175,7 @@ const NODES = [
         // 顶部按钮栏：3 = 交易市场、4 = 海克斯（1/2/5/6 留空），点开是选择对话框
         // 不能一次性停用：教程要求 Show 之后等 1~2 帧才能设"启用"，脚本内部靠
         // ChoukaBtnStage 分两次求值完成（0→1 建、1→2 启用），之后空转即可。
-        file: 'lua/chouka/16_buttons.lua',
+        file: 'lua/chouka/50_ui/16_buttons.lua',
         folder: '抽卡hex',
         name: '按钮栏',
         evaluationInterval: 1,       // 一秒节点
@@ -179,27 +189,98 @@ const NODES = [
         //      照 DSA PureDrawJoinAIAttackTeam 塞进 "<阵营>/ATTACK" 攻击队，
         //      让原本站着不动的中立单位主动去打玩家
         // 不能一次性停用：整局都要跑（脚本内部靠 CHOUKA_ROUND 变化触发抽卡）
-        file: 'lua/chouka/17_ai.lua',
+        file: 'lua/chouka/60_ai/17_ai.lua',
         folder: '抽卡hex',
         name: 'AI对手',
         evaluationInterval: 1,       // 一秒节点：回合变化判定 + 5 秒一次的扫场
         deactivateUponSuccess: false,
     },
     {
-        file: 'lua/chouka/13_frame_loop.lua',
+        file: 'lua/chouka/10_boot/13_frame_loop.lua',
         folder: '抽卡hex',
         name: '帧循环',
         evaluationInterval: 0,       // 每帧：消费帧延迟队列（截获要等 3 帧再删批）
         deactivateUponSuccess: false,
     },
     {
-        file: 'lua/chouka/20_hud.lua',
+        file: 'lua/chouka/50_ui/20_hud.lua',
         folder: '抽卡hex',
         name: 'HUD',
         evaluationInterval: 1,       // 约 1 秒：刷计分板与左下角倒计时
         deactivateUponSuccess: false,
     },
-];
+
+    // ============================================================
+    // 三国杀模式（docs/11-三国杀模式方案.md）
+    //   ★ 四个节点排在最末：默认玩法（CHOUKA_MODE == 0）时它们第一句就是
+    //     `if CHOUKA_MODE ~= 1 then return end`，等于空转；排最后保证前面 16 个节点
+    //     的既有时序一点不动。
+    //   ★ 故意拆成 4 个节点而不是拼成一个 46 KB 的大节点：payload 里任何一处语法错误
+    //     都会让**整个节点**静默不执行，拆开之后"偏好面板挂了"不至于把"胜负判定"带死。
+    //     节点之间不靠顺序，靠全局标志位接力：
+    //       32 置 ChoukaBangPrefDone → 30 发身份置 ChoukaBangRolesReady
+    //       → 31 补设关系 → 03_start 正式开局置 ChoukaBangStartApplied → 33 判胜负
+    // ============================================================
+    {
+        // 身份核心：模式开关 / 参战座位（活着的起重机）/ 身份表 / 洗牌 / 私发身份 / 顶部情报按钮
+        file: 'lua/chouka/70_bang/30_bang_mode.lua',
+        folder: '抽卡hex',
+        name: '三国杀-身份',
+        evaluationInterval: 1,       // 一秒节点：偏好结束后发身份 + 之后连刷顶部按钮 12 秒
+        deactivateUponSuccess: false,
+    },
+    {
+        // 结盟：PLAYER_RELATES_PLAYER 的单向/双向包装 + 初始关系四遍覆盖
+        file: 'lua/chouka/70_bang/31_bang_alliance.lua',
+        folder: '抽卡hex',
+        name: '三国杀-结盟',
+        evaluationInterval: 1,       // 一秒节点：关系模块晚于发身份加载时补设一次
+        deactivateUponSuccess: false,
+    },
+    {
+        // 身份偏好投票：自绘 5 张卡片 + 确认按钮 + 180 秒超时
+        file: 'lua/chouka/70_bang/32_bang_pref.lua',
+        folder: '抽卡hex',
+        name: '三国杀-偏好',
+        evaluationInterval: 1,       // ★ 必须是 1 秒：180 秒超时就靠这个节点数秒
+        deactivateUponSuccess: false,
+    },
+    {
+        // 胜负判定与结算：阵亡公开身份 / 反贼·内奸·主公忠臣三路胜利 / 赢家结盟 + 输家清场
+        file: 'lua/chouka/70_bang/33_bang_win.lua',
+        folder: '抽卡hex',
+        name: '三国杀-胜负',
+        evaluationInterval: 1,
+        deactivateUponSuccess: false,
+    },
+    {
+        // 结盟面板：照搬官渡之战的 BangUi（顶部第 5 个按钮 → 玩家列表 → 目标操作页）。
+        // 两种模式都用它：三国杀里点玩家还看得到身份，常规混战里就是纯结盟/外交。
+        file: 'lua/chouka/70_bang/35_ally_panel.lua',
+        folder: '抽卡hex',
+        name: '结盟面板',
+        evaluationInterval: 1,       // 一秒节点：顶部按钮连刷 30 秒 + 结算后收面板
+        deactivateUponSuccess: false,
+    },
+    // ---- 自定义 UI 贴图（tools/build-ui-assets.js 生成）----
+    // 3 个节点装官渡的操作图标，1 个节点装本图自己的按钮图（hextech 返回/关闭 4 态）
+    // 和代码生成的玩家颜色纯色块。只有第一次求值会真的建贴图。
+    {
+        file: 'lua/chouka/95_assets/00_action_a.lua',
+        folder: '抽卡hex', name: '贴图-操作A', evaluationInterval: 1, deactivateUponSuccess: false,
+    },
+    {
+        file: 'lua/chouka/95_assets/01_action_b.lua',
+        folder: '抽卡hex', name: '贴图-操作B', evaluationInterval: 1, deactivateUponSuccess: false,
+    },
+    {
+        file: 'lua/chouka/95_assets/02_action_c.lua',
+        folder: '抽卡hex', name: '贴图-操作C', evaluationInterval: 1, deactivateUponSuccess: false,
+    },
+    {
+        file: 'lua/chouka/95_assets/03_ui.lua',
+        folder: '抽卡hex', name: '贴图-按钮与颜色', evaluationInterval: 1, deactivateUponSuccess: false,
+    },];
 
 // 地编里这些 *_IGNORE 字段只给人看，编译器不读；照 DSA 的原样写上，方便在编辑器里核对。
 const CONDITION_TRUE = {
@@ -252,8 +333,8 @@ function nodeFiles(node) {
  * 结果"流程断在哪"完全没法判断。现在统一由 00_alert.lua 三路输出。
  */
 const SHARED_PRELUDE = [
-    'lua/chouka/00_alert.lua',
-    'lua/chouka/01_texts.lua',   // 文案总表（所有对玩家显示的文本 + 日志文案都在这一个文件里）
+    'lua/chouka/00_core/00_alert.lua',
+    'lua/chouka/00_core/01_texts.lua',   // 文案总表（所有对玩家显示的文本 + 日志文案都在这一个文件里）
 ];
 
 function filesWithPrelude(node) {

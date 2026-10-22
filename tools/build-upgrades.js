@@ -9,7 +9,7 @@
  *   2. DSA_ggz自走棋/lua/Upgrade.lua 的 upgrades 列表 —— 抽卡升级完成通知用的全量表
  *   3. 双兵种作战-狭路相逢3.258V8/lib/enums/UpgradeEnum.lua —— 整个 mod 的升级枚举
  *
- * 输出 scripts/lua/chouka/gen_upgrades.lua：ChoukaUnlockUpgrades = { "Upgrade_X", ... }
+ * 输出 scripts/lua/chouka/90_gen/gen_upgrades.lua：ChoukaUnlockUpgrades = { "Upgrade_X", ... }
  * 运行时由 15_upgrades.lua 用 ExecuteAction("GIVE_PLAYER_UPGRADE", "<All Players>", name) 发下去。
  */
 'use strict';

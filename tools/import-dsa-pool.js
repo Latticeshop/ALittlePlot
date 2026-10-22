@@ -3,7 +3,7 @@
  * import-dsa-pool.js
  * ----------------------------------------------------------------------------
  * 从《DSA_ggz自走棋》导入抽卡卡池，并**按阵营切成四份**，生成
- * `ALittlePlot/scripts/lua/chouka/gen_pool.lua`。
+ * `ALittlePlot/scripts/lua/chouka/90_gen/gen_pool.lua`。
  *
  * 数据来源（全部只读，不改 DSA 目录）：
  *   · 卡池本体与档位权重：lua/GAME/PureDraw/02_data.lua

@@ -1,9 +1,9 @@
-﻿// ============================================================
+// ============================================================
 // 从地图自带的预览图生成"水陆掩码" Lua（抽卡hex 用）
 //
 // 用法（在 ALittlePlot 目录下）：
 //     node tools/build-watermask.js
-// 产物：scripts/lua/chouka/09a_watermask.lua  → 再跑 node tools/sync-scriptsdata.js
+// 产物：scripts/lua/chouka/90_gen/09a_watermask.lua  → 再跑 node tools/sync-scriptsdata.js
 //
 // 原理：地图文件夹里的 [cor]每人一小块地抽卡hex.tga 其实是 PNG（610×610），
 //       其中蓝色 rgb(68,94,106) = 海，其余像素 = 陆地；
@@ -118,7 +118,7 @@ lua += '        end\n';
 lua += '    end\n';
 lua += '    return 1\n';
 lua += 'end\n';
-fs.writeFileSync('E:/Ra3_CenterChess/ALittlePlot/scripts/lua/chouka/09a_watermask.lua', lua, 'utf8');
+fs.writeFileSync('E:/Ra3_CenterChess/ALittlePlot/scripts/lua/chouka/90_gen/09a_watermask.lua', lua, 'utf8');
 console.log(`✔ 09a_watermask.lua  ${Buffer.byteLength(lua)} B，网格 ${gw}x${gh}，陆地区间 ${totalSpans} 个`);
 
 // 验证

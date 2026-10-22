@@ -47,6 +47,9 @@
 			source="DATA:civilian/heidelberg_hb/optimized_props/hb_sidewalksegment02.xml"
 			type="instance"/>
 		<Include
+			source="DATA:civilian/heidelberg_hb/props/hb_sign06.xml"
+			type="instance"/>
+		<Include
 			source="DATA:civilian/iceland_il/props/il_runwaylight01.xml"
 			type="instance"/>
 		<Include
@@ -328,43 +331,43 @@
 		<Waypoint
 			id="center4">
 			<Position
-				x="2972.83584"
-				y="3028.882662"
+				x="2055.762828"
+				y="2456.711208"
 				z="0"/>
 		</Waypoint>
 		<Waypoint
 			id="center3">
 			<Position
-				x="3008.856421"
-				y="2969.026023"
+				x="3040"
+				y="1960.000001"
 				z="0"/>
 		</Waypoint>
 		<Waypoint
 			id="center2">
 			<Position
-				x="3078.716803"
-				y="2969.914665"
+				x="3905.505607"
+				y="2524.027207"
 				z="0"/>
 		</Waypoint>
 		<Waypoint
 			id="center1">
 			<Position
-				x="3114.026882"
-				y="3027.609063"
+				x="3949.467622"
+				y="3545.085666"
 				z="0"/>
 		</Waypoint>
 		<Waypoint
 			id="center6">
 			<Position
-				x="3081.314887"
-				y="3091.303048"
+				x="3044.54144"
+				y="4126.088429"
 				z="0"/>
 		</Waypoint>
 		<Waypoint
 			id="center5">
 			<Position
-				x="3005.522663"
-				y="3093.454081"
+				x="2172.673281"
+				y="3525.964046"
 				z="0"/>
 		</Waypoint>
 		<Waypoint
@@ -1213,6 +1216,214 @@
 				y="5505.586026"
 				z="0"/>
 		</Structure>
+		<Prop
+			Angle="-0.874186"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_Sign06"
+			id="HB_SIGN06">
+			<Position
+				x="3990.000009"
+				y="3490.000003"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="2.193282"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_Sign06"
+			id="HB_SIGN06">
+			<Position
+				x="3920"
+				y="3590.000008"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="-0.874186"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_Sign06"
+			id="HB_SIGN06">
+			<Position
+				x="2100.000001"
+				y="2409.999842"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="2.193282"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_Sign06"
+			id="HB_SIGN06">
+			<Position
+				x="2020.000001"
+				y="2500.000001"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="-3.049842"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_Sign06"
+			id="HB_SIGN06">
+			<Position
+				x="2980.000001"
+				y="1960.000001"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="0.036082"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_Sign06"
+			id="HB_SIGN06">
+			<Position
+				x="3100"
+				y="1960.000001"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="-2.059726"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_Sign06"
+			id="HB_SIGN06">
+			<Position
+				x="3880.000001"
+				y="2480"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="1.13737"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_Sign06"
+			id="HB_SIGN06">
+			<Position
+				x="3934.064003"
+				y="2575.474246"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="-3.120983"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_Sign06"
+			id="HB_SIGN06">
+			<Position
+				x="2970.000003"
+				y="4130.000003"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="0.182274"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_Sign06"
+			id="HB_SIGN06">
+			<Position
+				x="3110.000008"
+				y="4130.000003"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="-2.059726"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_Sign06"
+			id="HB_SIGN06">
+			<Position
+				x="2149.277866"
+				y="3474.410883"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="0"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_SidewalkSegment02"
+			id="HB_SIDEWALKSEGMENT02">
+			<Position
+				x="3044.582084"
+				y="3027.098248"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="1.13737"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="HB_Sign06"
+			id="HB_SIGN06">
+			<Position
+				x="2203.341608"
+				y="3569.884802"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="2.204778"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="IL_SeaCliffWall04"
+			id="IL_SEACLIFFWALL04">
+			<Position
+				x="3374.543686"
+				y="2883.752429"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="-0.913799"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="IL_SeaCliffWall04"
+			id="IL_SEACLIFFWALL04">
+			<Position
+				x="3313.098666"
+				y="2817.632649"
+				z="0"/>
+		</Prop>
+		<Prop
+			Angle="0.985862"
+			EventList=""
+			Faction="PlyrCivilian/teamPlyrCivilian"
+			Health="100"
+			Team="PlyrCivilian"
+			ThingTemplate="IL_SeaCliffWall05"
+			id="IL_SEACLIFFWALL05">
+			<Position
+				x="3418.302082"
+				y="3189.094084"
+				z="0"/>
+		</Prop>
 		<Prop
 			Angle="1.155946"
 			EventList=""
@@ -8923,7 +9134,7 @@
 				z="0"/>
 		</Prop>
 		<Prop
-			Angle="-0.937037"
+			Angle="-0.86544"
 			EventList=""
 			Faction="PlyrCivilian/teamPlyrCivilian"
 			Health="100"
@@ -8931,8 +9142,8 @@
 			ThingTemplate="IL_SeaCliffWall04"
 			id="IL_SEACLIFFWALL04">
 			<Position
-				x="3441.409281"
-				y="2741.004268"
+				x="3437.915628"
+				y="2740.481281"
 				z="0"/>
 		</Prop>
 		<Prop
@@ -9131,7 +9342,7 @@
 				z="0"/>
 		</Prop>
 		<Prop
-			Angle="-1.290799"
+			Angle="-1.135475"
 			EventList=""
 			Faction="PlyrCivilian/teamPlyrCivilian"
 			Health="100"
@@ -9139,8 +9350,8 @@
 			ThingTemplate="IL_SeaCliffWall05"
 			id="IL_SEACLIFFWALL05">
 			<Position
-				x="2995.401602"
-				y="3604.571628"
+				x="2994.093443"
+				y="3612.722463"
 				z="0"/>
 		</Prop>
 		<Prop
@@ -9154,19 +9365,6 @@
 			<Position
 				x="2994.456004"
 				y="3461.012049"
-				z="0"/>
-		</Prop>
-		<Prop
-			Angle="-1.206623"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="IL_SeaCliffWall05"
-			id="IL_SEACLIFFWALL05">
-			<Position
-				x="2992.135465"
-				y="3625.712009"
 				z="0"/>
 		</Prop>
 		<Prop
@@ -9534,20 +9732,7 @@
 				z="0"/>
 		</Prop>
 		<Prop
-			Angle="-1.290799"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="IL_SeaCliffWall05"
-			id="IL_SEACLIFFWALL05">
-			<Position
-				x="2994.275202"
-				y="1447.718668"
-				z="0"/>
-		</Prop>
-		<Prop
-			Angle="-1.206623"
+			Angle="-1.155268"
 			EventList=""
 			Faction="PlyrCivilian/teamPlyrCivilian"
 			Health="100"
@@ -9560,7 +9745,7 @@
 				z="0"/>
 		</Prop>
 		<Prop
-			Angle="-1.206623"
+			Angle="-1.191979"
 			EventList=""
 			Faction="PlyrCivilian/teamPlyrCivilian"
 			Health="100"
@@ -10883,19 +11068,6 @@
 			<Position
 				x="1213.33312"
 				y="2773.836484"
-				z="0"/>
-		</Prop>
-		<Prop
-			Angle="-1.163703"
-			EventList=""
-			Faction="PlyrCivilian/teamPlyrCivilian"
-			Health="100"
-			Team="PlyrCivilian"
-			ThingTemplate="IL_SeaCliffWall05"
-			id="IL_SEACLIFFWALL05">
-			<Position
-				x="2994.128002"
-				y="4693.169282"
 				z="0"/>
 		</Prop>
 		<Prop
@@ -12678,6 +12850,13 @@
 					</Action>
 				</Script>
 				<Script
+					id="ÓÍ¾®ÖØ½¨">
+					<Action
+						Type="DEBUG_MESSAGE_BOX">
+						<ParameterList/>
+					</Action>
+				</Script>
+				<Script
 					id="½âËø¿Æ¼¼">
 					<Action
 						Type="DEBUG_MESSAGE_BOX">
@@ -12714,6 +12893,69 @@
 				</Script>
 				<Script
 					id="HUD">
+					<Action
+						Type="DEBUG_MESSAGE_BOX">
+						<ParameterList/>
+					</Action>
+				</Script>
+				<Script
+					id="Èý¹úÉ±-Éí·Ý">
+					<Action
+						Type="DEBUG_MESSAGE_BOX">
+						<ParameterList/>
+					</Action>
+				</Script>
+				<Script
+					id="Èý¹úÉ±-½áÃË">
+					<Action
+						Type="DEBUG_MESSAGE_BOX">
+						<ParameterList/>
+					</Action>
+				</Script>
+				<Script
+					id="Èý¹úÉ±-Æ«ºÃ">
+					<Action
+						Type="DEBUG_MESSAGE_BOX">
+						<ParameterList/>
+					</Action>
+				</Script>
+				<Script
+					id="Èý¹úÉ±-Ê¤¸º">
+					<Action
+						Type="DEBUG_MESSAGE_BOX">
+						<ParameterList/>
+					</Action>
+				</Script>
+				<Script
+					id="½áÃËÃæ°å">
+					<Action
+						Type="DEBUG_MESSAGE_BOX">
+						<ParameterList/>
+					</Action>
+				</Script>
+				<Script
+					id="ÌùÍ¼-²Ù×÷A">
+					<Action
+						Type="DEBUG_MESSAGE_BOX">
+						<ParameterList/>
+					</Action>
+				</Script>
+				<Script
+					id="ÌùÍ¼-²Ù×÷B">
+					<Action
+						Type="DEBUG_MESSAGE_BOX">
+						<ParameterList/>
+					</Action>
+				</Script>
+				<Script
+					id="ÌùÍ¼-²Ù×÷C">
+					<Action
+						Type="DEBUG_MESSAGE_BOX">
+						<ParameterList/>
+					</Action>
+				</Script>
+				<Script
+					id="ÌùÍ¼-°´Å¥ÓëÑÕÉ«">
 					<Action
 						Type="DEBUG_MESSAGE_BOX">
 						<ParameterList/>

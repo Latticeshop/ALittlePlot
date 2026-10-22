@@ -242,7 +242,7 @@ function ChoukaDoBuyLevel(playerName)
     local ok, msg = ChoukaBuyLevel(playerName)
     SetWorldBuilderThisPlayer(previous)
     if ok == 1 then
-        _ALERT(msg)
+        ChoukaAlert(msg)
     else
         exAddTextToPublicBoardForPlayer(playerName, msg, 6)
     end
@@ -501,7 +501,23 @@ end
 -- ---------------- 事件回调 ----------------
 
 -- 顶部按钮点击（教程规定的固定名字）
+--   注意：onCustomBtnClickEvent 也转发到这里（自由摆放的自定义按钮走同一个入口）。
+--   三国杀的身份偏好已改用原生选择页（见 32_bang_pref.lua），这里只剩顶部按钮的点击。
 function onCenterTopBtnClickEvent(playerName, btnIndex)
+    -- ★ 三国杀模块先认领。它第一件事就判 CHOUKA_MODE，
+    --   非三国杀模式一律返回 0 → 与改造前逐字节一致（docs/11 §13）
+    if type(ChoukaBangOnBtn) == "function" then
+        if ChoukaBangOnBtn(playerName, btnIndex) == 1 then
+            return 1
+        end
+    end
+    -- 结盟面板（照搬官渡 BangUi）：认领顶部第 5 个按钮 + 1100~1187 面板内按钮。
+    -- 它不判模式：常规混战局也能用它结盟，所以放在三国杀之后、市场之前。
+    if type(ChoukaPanelOnBtn) == "function" then
+        if ChoukaPanelOnBtn(playerName, btnIndex) == 1 then
+            return 1
+        end
+    end
     if btnIndex == CHOUKA_BTN_MARKET then
         ChoukaShowMarketDialog(playerName)
     end

@@ -25,13 +25,22 @@ ChoukaStartScopeOptions = ChoukaStartScopeOptions or {
     [2] = { scope = 1, name = ChoukaT.scopeOwn },
 }
 
+-- 玩法档（第二组选项，见 docs/11-三国杀模式方案.md §2）
+ChoukaStartModeOptions = ChoukaStartModeOptions or {
+    [1] = { mode = 0, name = ChoukaT.bangModeDefault },
+    [2] = { mode = 1, name = ChoukaT.bangModeBang },
+}
+
 -- ---------------- 状态（必须是全局：Lua 桥的闭包拿不到外层 local） ----------------
 
 ChoukaStartStage     = ChoukaStartStage or 0     -- 0 未启动 / 1 等房主 / 2 已开局
 CHOUKA_GAME_STARTED  = CHOUKA_GAME_STARTED or 0  -- 0 未开局 / 1 已开局（全场共用）
-ChoukaStartScopeKey  = ChoukaStartScopeKey or 1  -- 房主选的档（键 1 = 箱子包括全部阵营，默认）
+ChoukaStartScopeKey  = ChoukaStartScopeKey or 1  -- 房主选的箱子档（键 1 = 箱子包括全部阵营，默认）
+ChoukaStartModeKey   = ChoukaStartModeKey or 1   -- 房主选的玩法档（键 1 = 默认玩法，默认）
+CHOUKA_MODE          = CHOUKA_MODE or 0          -- 0 默认玩法 / 1 三国杀（★ 点选项就写，不等确认）
 ChoukaStartTick      = ChoukaStartTick or 0      -- 等待期求值次数
 ChoukaStartConfirm   = ChoukaStartConfirm or 0   -- 房主点过「确认，开始游戏」
+ChoukaStartBangPath  = ChoukaStartBangPath or 0  -- 1 = 三国杀路径（要等偏好投票 + 发身份才正式开局）
 CHOUKA_DRAW_SCOPE    = CHOUKA_DRAW_SCOPE or 0    -- 0 全部阵营（默认）/ 1 只有自己阵营（12_puredraw_replace 用）
 
 -- ============================================================
@@ -187,20 +196,38 @@ function ChoukaStartShowDialog(playerName, dialogId, title, choices)
     call(exShowCustomBtnChoiceDialogForPlayer, args)
 end
 
+-- 两组选项拼成一条按钮列表：前面是箱子范围，后面是玩法，最后是确认 / 重看公告
+-- 按钮总数上限 7（exShowCustomBtnChoiceDialogForPlayer 固定 10 参 = 3 固定 + 7 按钮），
+-- 现在是 2 + 2 + 2 = 6 个，还余 1 格
 function ChoukaStartHostChoices()
     local choices = {}
-    for k = 1, getn(ChoukaStartScopeOptions), 1 do
-        local opt = ChoukaStartScopeOptions[k]
-        local mark = ""
+    local k, opt, mark
+    local scopeN = getn(ChoukaStartScopeOptions)
+    local modeN = getn(ChoukaStartModeOptions)
+
+    for k = 1, scopeN, 1 do
+        opt = ChoukaStartScopeOptions[k]
+        mark = ""
         if ChoukaStartScopeKey == k then
             mark = "√"                       -- 选中项带 √（作者指定的写法）
         end
         choices[k] = opt.name .. mark
     end
-    local n = getn(ChoukaStartScopeOptions)
-    choices[n + 1] = "确认，开始游戏"
-    choices[n + 2] = "重新查看公告"
-    return choices, n + 1, n + 2
+
+    for k = 1, modeN, 1 do
+        opt = ChoukaStartModeOptions[k]
+        mark = ""
+        if ChoukaStartModeKey == k then
+            mark = "√"
+        end
+        choices[scopeN + k] = opt.name .. mark
+    end
+
+    local confirmBtn = scopeN + modeN + 1
+    local rereadBtn = scopeN + modeN + 2
+    choices[confirmBtn] = "确认，开始游戏"
+    choices[rereadBtn] = "重新查看公告"
+    return choices, confirmBtn, rereadBtn
 end
 
 function ChoukaStartShowHostDialog(playerName)
@@ -257,9 +284,23 @@ function ChoukaStartWaitTick()
     end
     ChoukaStartShowCenterText()
 
-    if ChoukaStartConfirm == 1 then
-        ChoukaStartFinish()
+    -- ⚠ 这里不再直接调 ChoukaStartFinish()：正式开局的时机统一交给文件末尾的"每次求值"决定，
+    --   因为三国杀模式要先走完「偏好投票 + 发身份」才允许开局（docs/11 §3）
+end
+
+-- ②.5 三国杀专用：偏好投票要先能点按钮，所以"解锁相机 + 开输入 + 收公告"要提前做
+function ChoukaStartFinishFront()
+    ChoukaStartLockCamera(0)
+    if type(ExecuteAction) == "function" then
+        ExecuteAction("ENABLE_INPUT")
     end
+    if type(exHideLongTextDialog) == "function" then
+        exHideLongTextDialog()
+    end
+    if type(exHideCustomBtnChoiceDialogForPlayer) == "function" then
+        exHideCustomBtnChoiceDialogForPlayer(ChoukaStartHost)
+    end
+    return 1
 end
 
 -- ③ 正式开始：视角回自己出生点、解锁、发钱、倒计时起步
@@ -268,6 +309,10 @@ end
 function ChoukaStartFinish()
     ChoukaStartStage = 2
     CHOUKA_GAME_STARTED = 1
+    -- 33 号节点（胜负判定）从这一刻开始工作。
+    -- ★ 故意放在最前面而不是函数末尾：Lua 4.0 没有 pcall，后面任何一句报错都不该
+    --   把"判胜负"这件事一起废掉（身份和座位早就发好了，判定所需数据是齐的）。
+    ChoukaBangStartApplied = 1
 
     -- 抽卡范围：按房主在配置页选的那一档写进全局（12_puredraw_replace 抽池时读它）
     local scopeOpt = ChoukaStartScopeOptions[ChoukaStartScopeKey]
@@ -309,6 +354,9 @@ function ChoukaStartFinish()
         scopeText = ChoukaT.scopeOwn
     end
     ChoukaStartBroadcast(format(ChoukaT.hostConfigDone, scopeText, CHOUKA_BOX_SECONDS), 20)
+    if CHOUKA_MODE == 1 then
+        ChoukaStartBroadcast(ChoukaT.bangStartGo, 20)
+    end
 end
 
 -- ============================================================
@@ -334,7 +382,10 @@ function ChoukaLongText_start(playerName, btnIndex, dialogId)
     return 1
 end
 
--- 按钮对话框（房主配置）：1/2 = 两个二选一，第 3 个确认，第 4 个重看公告
+-- 按钮对话框（房主配置）：
+--   1..scopeN            = 箱子范围二选一
+--   scopeN+1..scopeN+modeN = 玩法二选一（默认 / 三国杀）
+--   +1 = 确认，开始游戏      +2 = 重新查看公告
 function ChoukaChoice_start(playerName, btnIndex, dialogId)
     if dialogId ~= CHOUKA_START_HOST_DIALOG then
         return 0
@@ -344,11 +395,12 @@ function ChoukaChoice_start(playerName, btnIndex, dialogId)
         return 1
     end
 
-    local optionCount = getn(ChoukaStartScopeOptions)
-    local confirmBtn = optionCount + 1
-    local rereadBtn = optionCount + 2
+    local scopeN = getn(ChoukaStartScopeOptions)
+    local modeN = getn(ChoukaStartModeOptions)
+    local confirmBtn = scopeN + modeN + 1
+    local rereadBtn = scopeN + modeN + 2
 
-    if btnIndex >= 1 and btnIndex <= optionCount then
+    if btnIndex >= 1 and btnIndex <= scopeN then
         ChoukaStartScopeKey = btnIndex
         -- 房主每点一次选项，全图播一条（照 DSA：让所有人知道房主正在选什么）
         local picked = ChoukaStartScopeOptions[btnIndex]
@@ -359,13 +411,52 @@ function ChoukaChoice_start(playerName, btnIndex, dialogId)
         ChoukaStartShowHostDialog(playerName)
         return 1
     end
+
+    if btnIndex > scopeN and btnIndex <= scopeN + modeN then
+        local modeKey = btnIndex - scopeN
+        ChoukaStartModeKey = modeKey
+        local pickedMode = ChoukaStartModeOptions[modeKey]
+        if pickedMode ~= nil then
+            -- ★ 点选项就立刻写 CHOUKA_MODE（不等"确认"）：
+            --   13_frame_loop 的 3 分钟保险丝靠它立刻让位，见 docs/11 §2③
+            CHOUKA_MODE = pickedMode.mode
+            if pickedMode.name ~= nil then
+                ChoukaStartBroadcast(format(ChoukaT.hostPicking, pickedMode.name), 8)
+            end
+        end
+        ChoukaStartShowHostDialog(playerName)
+        return 1
+    end
+
     if btnIndex == confirmBtn then
         ChoukaStartConfirm = 1
+        -- 三国杀路径：先弹全员偏好面板，等投票 + 发身份走完才正式开局
+        if CHOUKA_MODE == 1 then
+            ChoukaStartBangPath = 1
+            -- ⚠ 顺序有讲究：ChoukaStartFinishFront() 会调 exHideCustomBtnChoiceDialogForPlayer(房主)，
+            --   而那个接口是"关掉该玩家当前的按钮对话框"、不区分 id。
+            --   如果先弹偏好面板再收尾，房主自己的偏好面板会被一起关掉。
+            --   所以：先收尾（关配置页），后弹偏好面板。
+            ChoukaStartFinishFront()
+            if type(ChoukaBangBeginPreference) == "function" then
+                ChoukaBangBeginPreference()
+            else
+                -- 偏好模块没加载（脚本报错/节点没导入）：退化成纯随机，别让整局卡死
+                ChoukaAlert(ChoukaT.bangPrefNoModule)
+                ChoukaBangPrefDone = 1
+            end
+        end
         if type(exHideCustomBtnChoiceDialogForPlayer) == "function" then
-            exHideCustomBtnChoiceDialogForPlayer(playerName)
+            -- 房主点完确认，配置页收掉（上面 FinishFront 已经收过一次，这里幂等）
+            -- 注意：三国杀路径下这时候房主屏幕上开着的可能是"身份偏好"面板，
+            -- 所以只在非三国杀模式下才由这里关。
+            if CHOUKA_MODE ~= 1 then
+                exHideCustomBtnChoiceDialogForPlayer(playerName)
+            end
         end
         return 1
     end
+
     if btnIndex == rereadBtn then
         if type(exShowLongTextDialogForPlayer) == "function" then
             exShowLongTextDialogForPlayer(playerName, CHOUKA_START_ANNOUNCE_DIALOG,
@@ -392,6 +483,15 @@ if CHOUKA_GAME_STARTED == 1 then
     -- 已经开局：本节点只剩"让上面两个回调一直存在"的作用，什么都不做
 elseif ChoukaStartStage == 0 then
     ChoukaStartBegin()
+elseif ChoukaStartBangPath == 1 then
+    -- 三国杀路径：相机已在 ChoukaStartFinishFront 里解锁，这里不再重钉视角，
+    -- 只等 32 号节点投完票（ChoukaBangPrefDone）+ 30 号节点发完身份（ChoukaBangRolesReady）
+    if ChoukaBangPrefDone == 1 and ChoukaBangRolesReady == 1 then
+        ChoukaStartFinish()
+    end
 else
     ChoukaStartWaitTick()
+    if ChoukaStartConfirm == 1 then
+        ChoukaStartFinish()
+    end
 end

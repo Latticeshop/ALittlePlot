@@ -32,7 +32,8 @@
 | `抽卡hex/私有箱` | 1（≈1 秒，**自己数秒**） | ❌ 常驻 | `CONDITION_TRUE` | 每秒把 `CHOUKA_BOX_LEFT` 减 1，减到 0 才开新回合：每人两个点位各刷一个箱子（种类见 `02a_crate_list.lua`，已有箱子就跳过）+ 重置倒计时 + 回合数 +1（**开局后才走**） | `02_private_box.lua` |
 | `抽卡hex/抽卡初始化` | 0（每帧） | ✅ 成功即自我停用 | `CONDITION_TRUE` | 截获原版抽卡结果并转成卡池单位：**原生结果几个就补几个**（单抽 1 / 十连 10，上限 10），按阵营池 + 水陆筛选（docs/08 §2、§5） | `10_puredraw_data.lua` + `gen_pool.lua` + `11_puredraw_hook.lua` + `12_puredraw_replace.lua` |
 | `抽卡hex/保底军犬` | 1（≈1 秒） | ❌ 常驻 | `CONDITION_TRUE` | **只看玩家手上有没有苏联/盟军工程师**：为 0 时每 5 秒在「起重机→出生点 55% 处」补 1 个，有就一只都不多刷。补的种类是 **SovietEngineer / AlliedEngineer 随机**（随机取千分位奇偶 + **最多连续 2 次同一种**，保证两种都会出现；作者实测反馈过"只见到盟军工程师"）。这两种不会作为原生抽卡结果出现，所以不会被自己的抽卡系统误删；日志会打 `保底工程师：给 Player_N 投放 <类型>` | `05_dog.lua` |
-| `抽卡hex/中央油井` | 1（≈1 秒） | ❌ 常驻 | `CONDITION_TRUE` | 中央两座油井（真名 `centerOil1`/`centerOil2`，拿不到才按离 `center` 250 内的 `OilDerrick` 兜底）：每 5 秒扫半径 200 按玩家计数，**连续领先 3 次**才换归属并真实转所有权；每回合在 `center1~6` 各刷 1 个钱箱（点位已有箱子就跳过）（docs/08 §1、§3） | `06_center.lua` |
+| `抽卡hex/中央油井` | 1（≈1 秒） | ❌ 常驻 | `CONDITION_TRUE` | 中央两座油井（真名 `centerOil1`/`centerOil2`，拿不到才按离 `center` 250 内的 `OilDerrick` 兜底）：每 5 秒扫半径 200 按玩家计数，**连续领先 3 次**才换归属并真实转所有权；每回合在 `center` + `center1~6`（**七个点位**）各刷 1 个钱箱（点位已有箱子就跳过），箱子归属 = 离该点最近且起重机还活着的玩家（docs/08 §1、§3） | `06_center.lua` |
+| `抽卡hex/油井重建` | 1（≈1 秒） | ❌ 常驻 | `CONDITION_TRUE` | **油井被"阵亡清场"带走之后原地重生一口中立无敌井**：中央 `centerOilK` 与玩家 `oilN` 都按真名找回；每秒给占领者发战利品收入（+40/s），每 5 秒做一次重建 + 占点扫描（连续领先 3 次 ≈15 秒算占领）。**不满 6 人的局，空位既无起重机也无油井 → 登记时就排除，永不重建**（docs/12） | `08_oilfield.lua` |
 | `抽卡hex/解锁科技` | 1（≈1 秒） | ✅ 成功即自我停用 | `CONDITION_TRUE` | 开局把全部科技协议发给 `<All Players>`（含龙船全套升级） | `gen_upgrades.lua` + `15_upgrades.lua` |
 | `抽卡hex/发技能` | 1（≈1 秒） | ❌ 常驻（脚本内只发一次） | `CONDITION_TRUE` | **开局后**给真人玩家发 `SpecialPower_LuckyUnitCrate`（单抽）+ `SpecialPower_LuckyUnitCrateX10`（十连）；`CHOUKA_DRAW_POWER_GRANTED` 保证只发一次。节点不能设一次性，否则会在开局前自我停用（docs/08 §2） | `14_grant_draw.lua` |
 | `抽卡hex/按钮栏` | 1（≈1 秒） | ❌ 常驻 | `CONDITION_TRUE` | 顶部按钮栏：3=交易市场、4=海克斯（禁用），1/2/5/6 留空；脚本内分两次求值（先 Show、一秒后再设 Enable）；**开局后才建** | `16_buttons.lua` |
@@ -54,41 +55,57 @@
 ```
 ALittlePlot/
 ├─ scripts/
-│  ├─ lua/chouka/00_alert.lua          ← 真源：**诊断通道**（_LOG / _ALERT / 节点自检；构建时拼到每个节点最前面）
-│  ├─ lua/chouka/00_selfcheck.lua      ← 真源：**自检心跳**（每 10 秒一行日志，排第一个节点）
-│  ├─ lua/chouka/01_texts.lua           ← **文案总表**（所有玩家可见文本 + 日志文案，tools/extract-texts.js 生成）
-│  ├─ lua/chouka/03_start.lua           ← 真源：**开局流程**（锁视角+公告+房主配置+正式开始，docs/06）
-│  ├─ lua/chouka/07_crates.lua          ← 真源：**引擎随机箱清理**（除预设点位外不出现自然随机箱，docs/07）
-│  ├─ lua/chouka/00_init.lua            ← 真源：地图级一次性别（视野/电力/禁建造/资金兜底/倒计时初值）
-│  ├─ lua/chouka/01_income.lua          ← 真源：收入
-│  ├─ lua/chouka/02a_crate_list.lua     ← **箱子种类表**（家里 boxN1/2 + 中央 center1~6 刷什么箱子，改权重只改这）
-│  ├─ lua/chouka/02_private_box.lua     ← 真源：私有箱（含去重 + 回合数自增，1 秒节点自己数秒）
-│  ├─ lua/chouka/09_level.lua           ← 真源：抽卡等级表（等级 → 各档概率 / 升级价）
-│  ├─ lua/chouka/05_dog.lua             ← 真源：保底单位（工程师，节点名仍叫"保底军犬"）
-│  ├─ lua/chouka/06_center.lua          ← 真源：中央油井占领（真名优先 + 几何兜底 + 争夺式）+ 中央钱箱每回合去重刷新 + `_ALERT` 诊断（docs/08 §二①②③）
-│  ├─ lua/chouka/10_puredraw_data.lua   ← 真源：抽卡数据（原生结果类型 / 白名单 / 状态）
-│  ├─ lua/chouka/gen_pool.lua           ← **生成物**：卡池 + 阵营池 + 类别表（tools/build-pool.js）
-│  ├─ lua/chouka/gen_allunits.lua       ← 生成物：全部单位类型表（日冕单位信息汇总.txt 全表）
-│  ├─ lua/chouka/11a_register.lua       ← 真源：整表登记出生事件 + onUnitCreateEvent
-│  ├─ lua/chouka/12_puredraw_replace.lua← 真源：删整批 + 补 N 个（单抽 1 / 十连 10）+ 帧延迟队列 + 水陆筛选 + 阵营池范围
-│  ├─ lua/chouka/17_ai.lua             ← 真源：AI 对手（电脑每回合免费抽卡，初始 1 个每 5 回合 +1；中立单位加入 ATTACK 攻击队）
-│  ├─ lua/chouka/13_frame_loop.lua      ← 真源：每帧驱动 + 开局超时兜底
-│  ├─ lua/chouka/gen_upgrades.lua       ← **生成物**：要解锁的科技协议名单（tools/build-upgrades.js）
-│  ├─ lua/chouka/15_upgrades.lua        ← 真源：开局 GIVE_PLAYER_UPGRADE 全发
-│  ├─ lua/chouka/14_grant_draw.lua      ← 真源：发抽卡技能（单抽 + 十连，开局后才发）
-│  ├─ lua/chouka/16_buttons.lua         ← 真源：顶部按钮栏 + 交易市场 + 氪金防御塔
-│  ├─ lua/chouka/20_hud.lua             ← 真源：计分板 + 左下角回合数/倒计时
-│  └─ ScriptsData.json                  ← 生成物（给 JSON 地编导入）
+│  ├─ lua/chouka/                      ← Lua 真源，按职责分 9 个目录（另有 chouka/README.md）
+│  │  ├─ 00_core/                        公共底座：构建时拼到**每个**节点最前面
+│  │  │  ├─ 00_alert.lua                 **诊断通道**（_LOG / _ALERT / 节点自检）
+│  │  │  └─ 01_texts.lua                 **文案总表**（所有玩家可见文本，tools/extract-texts.js 生成）
+│  │  ├─ 10_boot/                        启动与总调度
+│  │  │  ├─ 00_selfcheck.lua             **自检心跳**（每 10 秒一行日志，排第一个节点）
+│  │  │  ├─ 03_start.lua                 **开局流程**（锁视角+公告+房主配置+正式开始，docs/06）
+│  │  │  ├─ 13_frame_loop.lua            每帧驱动 + 开局超时兜底
+│  │  │  └─ 14_grant_draw.lua            发抽卡技能（单抽 + 十连，开局后才发）
+│  │  ├─ 20_economy/                     经济与成长
+│  │  │  ├─ 01_income.lua                收入（底薪 / 油井 / 中央油井；三国杀主公底薪 ×1.5）
+│  │  │  ├─ 09_level.lua                 抽卡等级表（等级 → 各档概率 / 升级价）
+│  │  │  └─ 15_upgrades.lua              开局 GIVE_PLAYER_UPGRADE 全发
+│  │  ├─ 30_world/                       地图底座与中立点位
+│  │  │  ├─ 00_init.lua                  地图级一次性别（视野/电力/禁建造/资金兜底/倒计时初值）
+│  │  │  ├─ 05_dog.lua                   保底单位（工程师，节点名仍叫"保底军犬"）
+│  │  │  ├─ 06_center.lua                中央油井占领 + 中央钱箱每回合去重刷新 + `_ALERT` 诊断
+│  │  │  └─ 08_oilfield.lua              中立油井重建：阵亡者的油井变回中立无敌井（docs/12）
+│  │  ├─ 40_draw/                        抽卡核心
+│  │  │  ├─ 02a_crate_list.lua           **箱子种类表**（家里 boxN1/2 + 中央 center+center1~6，改权重只改这）
+│  │  │  ├─ 02_private_box.lua           私有箱（含去重 + 回合数自增，1 秒节点自己数秒）
+│  │  │  ├─ 07_crates.lua                **引擎随机箱清理**（除预设点位外不出现自然随机箱，docs/07）
+│  │  │  ├─ 10_puredraw_data.lua         抽卡数据（原生结果类型 / 白名单 / 状态）
+│  │  │  ├─ 11a_register.lua             整表登记出生事件 + onUnitCreateEvent
+│  │  │  └─ 12_puredraw_replace.lua      删整批 + 补 N 个 + 帧延迟队列 + 水陆筛选 + 阵营池范围
+│  │  ├─ 50_ui/                          界面
+│  │  │  ├─ 16_buttons.lua               顶部按钮栏 + 交易市场 + 氪金防御塔
+│  │  │  └─ 20_hud.lua                   计分板 + 左下角回合数/倒计时
+│  │  ├─ 60_ai/
+│  │  │  └─ 17_ai.lua                    AI 对手（电脑每回合免费抽卡；中立单位加入 ATTACK 攻击队）
+│  │  ├─ 70_bang/                        **三国杀模式**（docs/11）
+│  │  │  ├─ 30_bang_mode.lua             身份核心：参战座位 / 身份表 / 洗牌 / 发身份 / 顶部情报按钮
+│  │  │  ├─ 31_bang_alliance.lua         结盟（单向 / 双向 PLAYER_RELATES_PLAYER）
+│  │  │  ├─ 32_bang_pref.lua             身份偏好投票卡片 + 180 秒超时
+│  │  │  └─ 33_bang_win.lua              胜负判定与结算
+│  │  └─ 90_gen/                         **生成物目录，勿手改**
+│  │     ├─ 09a_watermask.lua            海/陆掩码（tools/build-watermask.js）
+│  │     ├─ gen_pool.lua                 卡池 + 阵营池 + 类别表（tools/build-pool.js）
+│  │     ├─ gen_allunits.lua             全部单位类型表（日冕单位信息汇总.txt 全表）
+│  │     └─ gen_upgrades.lua             要解锁的科技协议名单（tools/build-upgrades.js）
+│  └─ ScriptsData.json                  ← 生成物（给 JSON 地编导入，21 个节点）
 └─ tools/
    ├─ sync-scriptsdata.js               ← 生成器（零依赖 node；支持一个节点拼多个 lua）
    ├─ build-pool.js                     ← 卡池生成器（读作者《完整单位表》+ 两份中文字典）
    ├─ pool-alias.js                     ← 中文名→类型名 的简称对照表
    ├─ build-upgrades.js                 ← 科技协议名单生成器（读双兵种 / DSA 三处清单）
-   ├─ build-watermask.js                ← 从地图预览图提取"海/陆"死数据 → 09a_watermask.lua
+   ├─ build-watermask.js                ← 从地图预览图提取"海/陆"死数据 → 90_gen/09a_watermask.lua
    ├─ extract-comments.js               ← 把 lua 里的大段纯注释搬到 docs/10-Lua注释存档.md
-   ├─ extract-texts.js                   ← 把 lua 里**玩家可见**的大段文本串搬到 chouka/01_texts.lua（只追加，跳过 _LOG）
-   ├─ split-log-texts.js                  ← 反向：把"其实只进 _LOG"的条目搬回代码（文案表只留玩家看得见的）
-   └─ lua-callsite.js                     ← 上面两个共用的"这个字符串被哪个函数包着"判定（认得出跨行 _LOG(format(...))）
+   ├─ extract-texts.js                  ← 把 lua 里**玩家可见**的大段文本串搬到 00_core/01_texts.lua（只追加，跳过 _LOG）
+   ├─ split-log-texts.js                ← 反向：把"其实只进 _LOG"的条目搬回代码（文案表只留玩家看得见的）
+   └─ lua-callsite.js                   ← 上面两个共用的"这个字符串被哪个函数包着"判定（认得出跨行 _LOG(format(...))）
 ```
 
 ```powershell
@@ -102,25 +119,30 @@ node tools/extract-texts.js             # 把**玩家可见**的大段文本串�
 node tools/split-log-texts.js           # 反过来：把只进日志的条目搬回代码
 ```
 
-当前产物（16 个节点，全部远低于 64 KB 单条上限；每个节点都自动多拼了 `00_alert.lua`）：
+当前产物（21 个节点，全部远低于 64 KB 单条上限；每个节点都自动多拼了 `00_alert.lua` + `01_texts.lua`）：
 
 ```
-  抽卡hex/自检          4019 B (余 61517 B)  interval=1
-  抽卡hex/开局         20845 B (余 44691 B)  interval=1
-  抽卡hex/随机箱清理    11884 B (余 53652 B)  interval=0
-  抽卡hex/初始化        10028 B (余 55508 B)  interval=0
-  抽卡hex/收入          5132 B (余 60404 B)  interval=1
-  抽卡hex/私有箱        9020 B (余 56516 B)  interval=1
-  抽卡hex/单位登记      18359 B (余 47177 B)  interval=0
-抽卡hex/抽卡初始化    52297 B (余 13239 B)  interval=0
-  抽卡hex/保底军犬      9944 B (余 55592 B)  interval=1
-  抽卡hex/中央油井     15181 B (余 50355 B)  interval=1
-  抽卡hex/解锁科技      6314 B (余 59222 B)  interval=1
-  抽卡hex/发技能        4350 B (余 61186 B)  interval=1
-  抽卡hex/按钮栏       17483 B (余 48053 B)  interval=1
-  抽卡hex/AI对手       15379 B (余 50157 B)  interval=1
-  抽卡hex/帧循环        4481 B (余 61055 B)  interval=0
-  抽卡hex/HUD          11542 B (余 53994 B)  interval=1
+  抽卡hex/自检              10321 B (余  55215 B)  interval=1
+  抽卡hex/开局              28659 B (余  36877 B)  interval=1
+  抽卡hex/随机箱清理           15767 B (余  49769 B)  interval=0
+  抽卡hex/初始化             13097 B (余  52439 B)  interval=0
+  抽卡hex/收入              12193 B (余  53343 B)  interval=1
+  抽卡hex/私有箱             39761 B (余  25775 B)  interval=1
+  抽卡hex/单位登记            22506 B (余  43030 B)  interval=0
+  抽卡hex/抽卡初始化           57078 B (余   8458 B)  interval=0
+  抽卡hex/保底军犬            16235 B (余  49301 B)  interval=1
+  抽卡hex/中央油井            22658 B (余  42878 B)  interval=1
+  抽卡hex/油井重建            27790 B (余  37746 B)  interval=1
+  抽卡hex/解锁科技            11877 B (余  53659 B)  interval=1
+  抽卡hex/发技能              9766 B (余  55770 B)  interval=1
+  抽卡hex/按钮栏             29771 B (余  35765 B)  interval=1
+  抽卡hex/AI对手            20537 B (余  44999 B)  interval=1
+  抽卡hex/帧循环             11021 B (余  54515 B)  interval=0
+  抽卡hex/HUD             16982 B (余  48554 B)  interval=1
+  抽卡hex/三国杀-身份          20207 B (余  45329 B)  interval=1
+  抽卡hex/三国杀-结盟          14063 B (余  51473 B)  interval=1
+  抽卡hex/三国杀-偏好          24140 B (余  41396 B)  interval=1
+  抽卡hex/三国杀-胜负          16235 B (余  49301 B)  interval=1
 ```
 
 - 单个 payload 上限 **65536 B**，超了 WorldBuilder 会截断，游戏内报 `last token read: '<eof>'`；
@@ -175,7 +197,7 @@ node tools/split-log-texts.js           # 反过来：把只进日志的条目�
 | 自定义抽卡概率 | `10_puredraw_data.lua` 的 `CHOUKA_CUSTOM_CHANCE` | 100 = 全部自定义（当前）；调小就是"有概率保留原版结果" |
 | 左下角两行文字 | `20_hud.lua` 顶部 `CHOUKA_HUD_TEXT_X` / `CHOUKA_HUD_ROUND_Y` / `CHOUKA_HUD_COUNTDOWN_Y` / `*_COLOR` / `CHOUKA_HUD_TEXT_SIZE` | `AlignY="bottom"` 时 Y 从底边往上量；颜色是十进制 RGB（黄 `16776960`、橙 `16744448`） |
 | 卡池内容 / 阵营归属 / 水陆类别 | 别手改 `gen_pool.lua`；改 `tools/build-pool.js`（`USER_POOL` 作者清单、`AMPHIBIOUS` 两栖名单、`TIER_WEIGHTS` 权重）和 `tools/pool-alias.js`（中文名→类型名） | 改完跑 `node tools/build-pool.js && node tools/sync-scriptsdata.js`，生成器会把没翻译出来的名字全部打印出来 |
-| 对玩家显示的文本 | **集中在 `scripts/lua/chouka/01_texts.lua`（`ChoukaT` 表，35 条）**，代码里只写 `ChoukaT.<key>` | 它被拼进**每个节点**的 payload 公共前缀（和 `00_alert.lua` 一样），任何节点都能直接用 |
+| 对玩家显示的文本 | **集中在 `scripts/lua/chouka/00_core/01_texts.lua`（ChoukaT 表，78 条）**，代码里只写 `ChoukaT.<key>` | 它被拼进**每个节点**的 payload 公共前缀（和 `00_alert.lua` 一样），任何节点都能直接用 |
 | 日志文案（`_LOG`） | **就地写在业务代码里，不进文案表** | 作者要求"玩家的"和"开发的"分开，混在一起不好认（docs/08 §7.6） |
 | lua 里的注释 | 只写 1~3 行的短注释指路；**超过 3 行的纯说明搬到 `docs/10-Lua注释存档.md`** | payload 是把 lua 原文逐字节拼进 JSON 的，注释一样占节点体积（单节点上限 64 KB）。跑 `node tools/extract-comments.js` 自动搬（会校验代码指纹，误删代码会直接中止） |
 | 抽卡剔除哪些单位 | `tools/build-pool.js` 的 `BLACKLIST` | 默认剔除基地车/矿车/工程师等"不能打架"的单位；**四家基地车全都不进 T1~T4** |
@@ -219,9 +241,69 @@ node tools/split-log-texts.js           # 反过来：把只进日志的条目�
   字符串不能 `s:sub()`、泛型 `for` 必须写两个变量。
 - **闭包拿不到外层的 local**：需要跨调用保留的状态一律挂全局表。
 - 注释会原样进 payload、占 64 KB 预算（但注释不影响执行）。
+- ★ **不要去抢通用全局名（`_ALERT` / `_LOG` 这类）** —— 2026-10 实测的第二号杀手：
+  本图**别的脚本已经先占用了全局 `_ALERT`**，而 `00_alert.lua` 的写法是
+  `if _ALERT == nil then function _ALERT(...) end end`，于是我们那版**根本没装上**；
+  对方那一版既不写日志、也不往屏幕上出字。
+  表现极具迷惑性：**代码全跑对了，但所有"只由 `_ALERT` 输出"的文案一条都看不到** ——
+  阵亡身份揭示看不到、偏好提示看不到、中央油井占领播报看不到、结算结果也看不到，
+  而 `_LOG` 的文案（节点就绪/心跳/抽卡/收入）一切正常。
+  当时差点误判成"偏好节点没执行""阵亡判定写错了"。
+  对策：自己的播报用独占名字 **`ChoukaAlert` / `ChoukaAlertFor`**（`00_core/00_alert.lua`，
+  **无条件定义**、不参与任何 `== nil` 争夺），新代码一律用它们；`_LOG` 实测可靠可以照用。
+  排查口诀：**"日志里 `_LOG` 有、`_ALERT` 没有" = 全局名被抢，不可能是逻辑写错。**
 - `lua/*.lua` 是文档与真源，`ScriptsData.json` 永远是生成物 —— 不要手改 JSON 里的 payload。
-- 排错第一现场：`E:\CoronaLauncher\CoronaData\Logs\EnhancerCorona-<时间>.dll.log`（`exPrintln` 的去处），
+- 排错第一现场：`E:\CoronaLauncher\CoronaData\EnhancerLogs\EnhancerCorona-<时间>.dll.log`
+  （`exPrintln` 的去处；注意目录是 **EnhancerLogs**，不是 `Logs`），
   配合 `抽卡hex/自检` 节点的心跳行与各节点的「节点就绪：xxx」标记，能直接看出哪个节点没跑（见 §9.5）。
+
+### 8.1 玩家名字：真实昵称优先，`$p<N>Name` 只在部分通道有效
+
+- 占位符 `$p<N>Name` **不是万能转义**，实测分两类通道：
+
+| 通道 | `$p<N>Name` 会不会被替换 |
+|---|---|
+| 公屏 `exAddTextToPublicBoard` / 计分板 `exScoreBoardSetText` | ✅ 会（`20_hud.lua:93`、赤壁 `Bang_159_code.txt:335-340` 都是这么用的） |
+| 左下消息区 `exMessageAppendToMessageArea` | ✅ 会（阵亡播报实测正常） |
+| **顶部按钮悬浮框 desc**（`exCenterTopBtnShowForPlayer` 第 4 参） | ❌ **不会**，原样显示 `$P6Name` |
+| 日志 `exPrintln`（`_LOG`） | ❌ 不会（也没必要） |
+
+- 所以本图给了**两个**入口（`00_core/00_alert.lua`，随前导块进每个节点）：
+
+| 函数 | 用在哪 | 拿不到名字时退回 |
+|---|---|---|
+| `ChoukaPlayerDisplayName(seat)` | 公屏 / 消息区 / 计分板 | `$p<N>Name`（这些通道会替换） |
+| `ChoukaPlayerPlainName(seat)` | 悬浮框 desc / 对话框文字 | `nil`，调用方自己兜底（如 `"P6"`） |
+
+- 真实昵称来源：**`exGetPlayerNickNameByScriptName("Player_N")`**（参考脚本 `38_code.txt:119` 的
+  `PlayerModule.get_player_nickname` 就是它）。查到就缓存进 `ChoukaPlayerNames[seat]`，只查一次。
+- 玩家可见文案里写 `%s`，传上面两个函数的结果，不要拼 `"Player_" .. seat`。
+
+### 8.2 真人判定：唯一可靠的接口是 `ObjectPlayerScriptName("<1st Human Player>")`
+
+- `EvaluateCondition("PLAYER_IS_HUMAN_OR_AI_PERSONALITY", name, "Human")` 在参考脚本里能用
+  （`38_code.txt:174-179`、`17_ai.lua:93-100` 抄的就是它），但**本图实测对它返回空**。
+  踩过一次大坑：三国杀偏好面板判断"有没有真人"时全靠它 → 判出 0 个真人 →
+  走到"没有真人就直接随机"分支 → **面板从来没弹出来过**，日志里连一条偏好文案都没有。
+- 本图真正可用的写法（`03_start.lua:105-106`，房主配置页能正常弹给真人就是它的功劳）：
+  ```lua
+  local humanName = ObjectPlayerScriptName("<1st Human Player>")   -- 返回 "Player_1" 这种脚本名
+  ```
+  选择器常量抄自 `09_code.txt:30-40`（`<All Human Players>` / `<This Player>` / `<This Player's Enemies>` …）。
+- 结论：要"给真人做事"就用 §8.2 的写法；`EvaluateCondition` 那条路在本图不可信，
+  只能当额外信号，且必须带兜底。
+
+### 8.3 按钮选择对话框在引擎里只有一个"当前显示位"
+
+`exShowCustomBtnChoiceDialogForPlayer` 虽然是 per-player 的签名，但实测：
+
+- 给**另一个**座位 Show 一次，屏幕上正开着的那份会被顶掉；
+- 任何一个座位应答 / 被 `exHideCustomBtnChoiceDialogForPlayer` 收掉，收的也是同一份。
+
+所以：**只在"真人的那一份"上用这个控件**，别给 AI 座位弹（三国杀身份偏好的
+"真人还没选就被别人关了"就是这么来的）。同理，`ChoukaStartFinishFront()` 里那句
+`exHideCustomBtnChoiceDialogForPlayer(房主)` 必须排在"弹偏好面板"**之前**，
+否则会把房主刚弹出来的面板顺手关掉。
 
 ## 9 抽卡系统与 HUD（照搬 DSA）
 
@@ -432,6 +514,13 @@ node tools/split-log-texts.js           # 反过来：把只进日志的条目�
 参考 DSA 自走棋 `lua/GAME/PureDraw/04_draw.lua:495 PureDrawJoinAIAttackTeam` 与 `DEFAULTATTCKTEAM`，
 新增独立节点 `抽卡hex/AI对手`（`17_ai.lua`，1 秒节点，常驻）。它干两件事：
 
+> ★ **2026-10 实测修正：出局的电脑不再出兵。**
+> 打掉电脑的起重机后，出局玩家的 unit spawn **依然生效**，表现就是"人死了还在造兵"。
+> 现在抽兵前先过 `ChoukaAISeatAlive(index)`（判据 = `craneN` 还在且活着，
+> 和 `08_oilfield` 判岛主阵亡用的是同一个"水晶"），
+> `ChoukaAIDrawOne` 里和"每回合遍历座位"的循环里各有一道门。
+> 中立油井的重建不受影响（那是正常机制）。
+
 **① 电脑在抽卡（模拟）**：每回合给每个电脑座位免费抽卡 ——
 
 | 回合 | 每个电脑每回合抽几个 | 概率表 |
@@ -489,7 +578,7 @@ AI攻击队列：3 个非玩家阵营单位已加入攻击队
 0. **先验开局流程**（docs/06 §3 + docs/08 §7 有逐条清单）：锁视角→公告→中心黄字→房主配置（两个二选一，无资金档）→确认后回出生点、解锁、倒计时起步。
 1. **再验箱子还在不在**：**开局后** 120 秒各点位应出现金钱箱，点位已有箱时下一轮不叠加。
    （注意：不是"进游戏 120 秒"，开局时间点以房主点确认为准。）
-2. **验中央**：`center1~6` 每回合各刷 1 个钱箱且不叠加；站兵 15 秒左右能占下中央两座油井（公屏播报）。
+2. **验中央**：`center` + `center1~6` 七个点位每回合各刷 1 个钱箱且不叠加；站兵 15 秒左右能占下中央两座油井（公屏播报）。
 3. **验界面**：右上角计分板常驻、六行单位数会变；左下角文字每秒钟跳。
 4. **验抽卡能不能开**：顶部应有**单抽 + 十连两个**技能按钮 → 场上出现可拾取箱子 → 派单位去捡。
 5. **验截获**：单抽捡完后场上应该**只有 1 个**卡池单位；十连捡完后是 **10 个**，没有原版那一批残留。

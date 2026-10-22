@@ -17,7 +17,8 @@ const callsite = require('./lua-callsite.js');
 
 const ROOT = path.resolve(__dirname, '..');
 const LUA_DIR = path.join(ROOT, 'scripts', 'lua', 'chouka');
-const OUT = path.join(LUA_DIR, '01_texts.lua');
+// 文案总表在 00_core（与 00_alert.lua 同目录，两个文件都是每个节点都会拼上的公共底座）
+const OUT = path.join(LUA_DIR, '00_core', '01_texts.lua');
 const DRY = process.argv.indexOf('--dry') >= 0;
 
 const GENERATED = ['01_texts.lua', 'gen_pool.lua', 'gen_upgrades.lua', 'gen_allunits.lua', '09a_watermask.lua'];
@@ -29,6 +30,8 @@ const PREFIX = {
     '12_puredraw_replace.lua': 'pdr', '13_frame_loop.lua': 'frame',
     '14_grant_draw.lua': 'grant', '15_upgrades.lua': 'upg',
     '16_buttons.lua': 'btn', '17_ai.lua': 'ai', '20_hud.lua': 'hud',
+    '30_bang_mode.lua': 'bang', '31_bang_alliance.lua': 'ally',
+    '32_bang_pref.lua': 'pref', '33_bang_win.lua': 'win',
 };
 const MIN_CJK = 24;
 const MIN_ANY = 60;
@@ -47,14 +50,28 @@ function outerCallName(src, pos) {
     return callsite.outerCallName(src, pos, builtCache.get(src));
 }
 
-const files = fs.readdirSync(LUA_DIR).filter(f => f.endsWith('.lua') && GENERATED.indexOf(f) < 0).sort();
+/** 递归列出 chouka 下所有 lua（已按职责分 9 个子目录）；返回 { rel, name } */
+function listLuaFiles(dir, prefix) {
+    const out = [];
+    const entries = fs.readdirSync(dir, { withFileTypes: true })
+        .sort((a, b) => a.name.localeCompare(b.name));
+    for (const ent of entries) {
+        const rel = prefix ? prefix + '/' + ent.name : ent.name;
+        if (ent.isDirectory()) out.push(...listLuaFiles(path.join(dir, ent.name), rel));
+        else if (ent.name.endsWith('.lua')) out.push({ rel, name: ent.name });
+    }
+    return out;
+}
+
+const files = listLuaFiles(LUA_DIR, '').filter(x => GENERATED.indexOf(x.name) < 0);
 const added = [];
 const changes = [];
 let skippedLog = 0;
 
-for (const f of files) {
+for (const entry of files) {
+    const f = entry.rel;
     const src = fs.readFileSync(path.join(LUA_DIR, f), 'utf8').replace(/\r\n/g, '\n');
-    const prefix = PREFIX[f] || 'x';
+    const prefix = PREFIX[entry.name] || 'x';
     let seq = 0;
     let out = '';
     let i = 0;

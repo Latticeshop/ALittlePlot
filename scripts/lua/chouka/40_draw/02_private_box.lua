@@ -487,8 +487,9 @@ end
 
 -- ============================================================
 -- ① 开局门控：房主还没点确认 → 倒计时冻在整轮，回合数不推进，也不刷箱子
+--    三国杀模式结算之后同样停手（CHOUKA_BANG_ENDED 由 33_bang_win.lua 置 1）
 -- ============================================================
-if CHOUKA_GAME_STARTED ~= 1 then
+if CHOUKA_GAME_STARTED ~= 1 or CHOUKA_BANG_ENDED == 1 then
     CHOUKA_BOX_LEFT = CHOUKA_BOX_SECONDS
     return
 end
@@ -564,7 +565,7 @@ for i = 1, 6, 1 do
     end
 end
 
-_ALERT(format(ChoukaT.boxRefreshed, CHOUKA_ROUND))
+ChoukaAlert(format(ChoukaT.boxRefreshed, CHOUKA_ROUND))
 
 -- ★ 每回合开始补满飞机弹药（放在最后：万一这个接口报错，也挡不住上面刷箱和回合播报）
 if type(ChoukaRefillAircraftAmmo) == "function" then

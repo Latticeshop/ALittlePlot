@@ -10,8 +10,16 @@ CHOUKA_CENTER_DEBUG      = CHOUKA_CENTER_DEBUG or 0   -- 0 = 关闭诊断播报�
 CHOUKA_CENTER_RADIUS     = 200    -- 占点扫描半径（照双兵种）
 CHOUKA_CENTER_OIL_RADIUS = 250    -- 几何兜底：从航点 center 出发找油井的搜索半径
 CHOUKA_CENTER_CAPTURE_AT = 3      -- 连续领先几次才算占领（5 秒一次 → ≈15 秒）
-CHOUKA_CENTER_BOX_RANGE  = 25     -- 中央箱子点位占用判定半径（center1~6 相邻约 60）
+CHOUKA_CENTER_BOX_RANGE  = 25     -- 中央箱子点位占用判定半径（同一点位上已有没捡的箱子就跳过）
 CHOUKA_CENTER_REPORT     = 30     -- 没变化时每多少次占点播报一次（30*5=150 秒）
+
+-- 中央盲盒刷新点位：中心 `center` + 环上 6 点 `center1~6`，**共 7 个点位每回合各刷 1 个**。
+-- （作者 2026-10 要求七个点位都刷；`center1~6` 挪到玩家路上之后，中心点也一并刷）
+CHOUKA_CENTER_CRATE_WPS = {
+    "center",
+    "center1", "center2", "center3",
+    "center4", "center5", "center6",
+}
 
 ChoukaCenterOilOwner = ChoukaCenterOilOwner or { [1] = 0, [2] = 0 }   -- 0 = 中立
 ChoukaCenterOilScore = ChoukaCenterOilScore or { [1] = 0, [2] = 0 }   -- 挑战进度 0~3
@@ -20,29 +28,65 @@ ChoukaCenterOilObj   = ChoukaCenterOilObj or {}                       -- 油井�
 ChoukaCenterOilLead  = ChoukaCenterOilLead or { [1] = -1, [2] = -1 }  -- 上次播报的领先者（仅播报用）
 
 -- ★ 开局门控：房主点过「确认，开始游戏」之前什么都不做
-if CHOUKA_GAME_STARTED ~= 1 then
+--   三国杀模式结算之后同样停手（CHOUKA_BANG_ENDED 由 33_bang_win.lua 置 1）
+if CHOUKA_GAME_STARTED ~= 1 or CHOUKA_BANG_ENDED == 1 then
     return
 end
 
 ChoukaCenterTickCount = (ChoukaCenterTickCount or 0) + 1
 
+-- 中央盲盒归属：把 centerK 分给「离它最近、且起重机还活着」的玩家。
+-- 2026-10 作者把 center1~6 从中心小岛挪到了 6 条"玩家↔中心"的连接路上，
+-- 原来"按中央油井归属交替分成两堆"的规则就不再合适了：现在每个点位就落在某位玩家的必经路上，
+-- 按距离判定最自然，也不用维护一张手工映射表。箱子本身谁都能捡，这里只管归属颜色。
+-- ⚠ exWaypointGetPos 返回**数组**（p[1]/p[2]/p[3]），不是 p.X
+function ChoukaCenterCrateOwner(wp)
+    local p = exWaypointGetPos(wp)
+    if p == nil or p[1] == nil or p[2] == nil then
+        return 1
+    end
+    if type(GetObjectByScriptName) ~= "function" then
+        return 1
+    end
+
+    local best = 0
+    local bestDist = nil
+    local i, crane, cx, cy, dx, dy, dist
+    for i = 1, 6, 1 do
+        crane = GetObjectByScriptName("crane" .. i)
+        if crane ~= nil and ObjectIsAlive(crane) then
+            cx, cy = ObjectGetPosition(crane)
+            if cx ~= nil and cy ~= nil then
+                dx = p[1] - cx
+                dy = p[2] - cy
+                dist = dx * dx + dy * dy
+                if bestDist == nil or dist < bestDist then
+                    bestDist = dist
+                    best = i
+                end
+            end
+        end
+    end
+
+    if best == 0 then
+        return 1
+    end
+    return best
+end
+
 -- ============================================================
--- ① 中央钱箱：每回合在 center1~6 各刷 1 个，**点位已有箱子就跳过**
+-- ① 中央钱箱：每回合在 `center` + `center1~6`（共 7 个点位）各刷 1 个，**点位已有箱子就跳过**
 --    （和家里的 boxN1/boxN2 完全一样的规则；放在最前面，保证不会被下面占点逻辑拖累）
 -- ============================================================
 if CHOUKA_ROUND ~= nil and ChoukaCenterCrateRound ~= CHOUKA_ROUND
     and type(ChoukaBoxBusyRange) == "function" then
     ChoukaCenterCrateRound = CHOUKA_ROUND
     local spawnedCrates = 0
-    for k = 1, 6, 1 do
-        local wp = "center" .. k
+    for k = 1, getn(CHOUKA_CENTER_CRATE_WPS), 1 do
+        local wp = CHOUKA_CENTER_CRATE_WPS[k]
         if exWaypointGetPos(wp) ~= nil and ChoukaBoxBusyRange(wp, CHOUKA_CENTER_BOX_RANGE) == 0 then
-            -- 归属：占领了中央油井就给占领方，没人占就按点位交替给 1/2 号玩家（箱子谁都能捡）
-            local ownerIndex = 1
-            local oilOwner = ChoukaCenterOilOwner[mod(k, 2) + 1]
-            if oilOwner ~= nil and oilOwner > 0 then
-                ownerIndex = oilOwner
-            end
+            -- 归属：分给离这个点位最近的玩家（见上面的 ChoukaCenterCrateOwner）
+            local ownerIndex = ChoukaCenterCrateOwner(wp)
             local crateTeam = format("Player_%d/teamPlayer_%d", ownerIndex, ownerIndex)
             if type(ChoukaSpawnBoxCrate) == "function" then
                 ChoukaSpawnBoxCrate(crateTeam, wp, "center")
@@ -53,7 +97,8 @@ if CHOUKA_ROUND ~= nil and ChoukaCenterCrateRound ~= CHOUKA_ROUND
         end
     end
     if CHOUKA_CENTER_DEBUG == 1 then
-        _ALERT(format(ChoukaT.centerCrateRefreshed, CHOUKA_ROUND, spawnedCrates))
+        ChoukaAlert(format(ChoukaT.centerCrateRefreshed, CHOUKA_ROUND, spawnedCrates,
+            getn(CHOUKA_CENTER_CRATE_WPS)))
     end
 end
 
@@ -154,7 +199,7 @@ if CHOUKA_CENTER_DEBUG == 1 and ChoukaCenterOilReported ~= 1 then
             py = floor(oy)
         end
     end
-    _ALERT(ChoukaT.centerOilLocate .. t1 .. " 2号=" .. t2 .. " 1号坐标=(" .. px .. "," .. py .. ")")
+    ChoukaAlert(ChoukaT.centerOilLocate .. t1 .. " 2号=" .. t2 .. " 1号坐标=(" .. px .. "," .. py .. ")")
 end
 
 -- ============================================================
@@ -274,7 +319,7 @@ function ChoukaCenterTickCapture(k, oil, leadIndex)
         if oil ~= nil and ObjectIsAlive(oil) then
             ExecuteAction("NAMED_TRANSFER_OWNERSHIP_PLAYER", oil, "Player_" .. leadIndex)
         end
-        _ALERT(format(ChoukaT.centerOilCaptured, k, leadIndex))
+        ChoukaAlert(format(ChoukaT.centerOilCaptured, k, ChoukaPlayerDisplayName(leadIndex)))
     end
 end
 
@@ -293,7 +338,7 @@ if doCapture then
                     if ChoukaCenterOilLead[k] ~= leadIndex
                         or mod(ChoukaCenterTickCount, CHOUKA_CENTER_REPORT) == 0 then
                         ChoukaCenterOilLead[k] = leadIndex
-                        _ALERT(format(ChoukaT.centerOilProgress,
+                        ChoukaAlert(format(ChoukaT.centerOilProgress,
                             k, leadIndex, ChoukaCenterOilScore[k],
                             ChoukaCenterOilOwner[k], ChoukaCenterCountsText(counts)))
                     end

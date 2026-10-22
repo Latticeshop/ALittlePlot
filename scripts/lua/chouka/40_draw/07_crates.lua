@@ -10,7 +10,7 @@ CHOUKA_CRATE_FIRST_TICK  = 1     -- 第几帧删"生成器"
 CHOUKA_CRATE_SECOND_TICK = 45    -- 第几帧扫"已经刷出来的实体箱子"（照 DSA）
 CHOUKA_CRATE_SWEEP_EVERY = 600   -- 兜底扫描间隔（帧）；interval=0 即每帧一次求值
 CHOUKA_CRATE_SWEEP_UNTIL = 7200  -- 兜底扫描只跑到第几帧（≈2 分钟），之后不再扫
-CHOUKA_CRATE_KEEP_RANGE  = 80    -- 离预设点位多近算"自家箱子"（世界单位）；两点相距约 70
+CHOUKA_CRATE_KEEP_RANGE  = 80    -- 离预设点位多近算"自家箱子"（世界单位）；同一批点位彼此远大于这个值
 
 -- 引擎自然刷新的随机箱类型（生成器单独一份，见下）
 CHOUKA_CRATE_NATURAL = {
@@ -25,8 +25,10 @@ CHOUKA_CRATE_NATURAL = {
 -- 留着它就会一直往图上刷箱子，哪怕它正好落在某个点位旁边。
 CHOUKA_CRATE_SPAWNER = "GenericCrateSpawner"
 
--- 本图自己的箱子只会出现在这些点位上（02_private_box.lua 的两个箱点 + 06_center.lua 的中央六点）
+-- 本图自己的箱子只会出现在这些点位上
+-- （02_private_box.lua 的两组家庭箱点 + 06_center.lua 的中央七点 `center`+`center1~6`）
 -- （box1~box6 是老写法，留着兜底；实际航点是 box11~box62）
+-- ⚠ `center` 必须在这张表里：否则我们自己刷在中心点的盲盒会被下面的清理逻辑当成自然随机箱删掉
 CHOUKA_CRATE_KEEP_WPS = {
     [1]  = "box1",   [2]  = "box2",   [3]  = "box3",
     [4]  = "box4",   [5]  = "box5",   [6]  = "box6",
@@ -36,8 +38,8 @@ CHOUKA_CRATE_KEEP_WPS = {
     [13] = "box41",  [14] = "box42",
     [15] = "box51",  [16] = "box52",
     [17] = "box61",  [18] = "box62",
-    [19] = "center1", [20] = "center2", [21] = "center3",
-    [22] = "center4", [23] = "center5", [24] = "center6",
+    [19] = "center", [20] = "center1", [21] = "center2", [22] = "center3",
+    [23] = "center4", [24] = "center5", [25] = "center6",
 }
 
 ChoukaCrateTick       = ChoukaCrateTick or 0
@@ -149,7 +151,7 @@ elseif ChoukaCrateTick == CHOUKA_CRATE_SECOND_TICK then
     local removed = ChoukaCrateSweep()
     ChoukaCrateSweptTotal = ChoukaCrateSweptTotal + removed
     if removed > 0 then
-        _ALERT(format(ChoukaT.crateCleaned, removed))
+        ChoukaAlert(format(ChoukaT.crateCleaned, removed))
     end
 elseif ChoukaCrateTick > CHOUKA_CRATE_SECOND_TICK
     and ChoukaCrateTick <= CHOUKA_CRATE_SWEEP_UNTIL

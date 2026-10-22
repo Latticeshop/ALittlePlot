@@ -8,7 +8,7 @@
  *        · 日冕地图lua例子/自定义抽卡池.txt（DSA 抽卡池表，含 中文名/单位类型/价格）
  *        · DSA HextechRune/05_ultimate_creature.lua 的 NonProductionUnitTier 注释（非可生产单位）
  *
- * 生成 scripts/lua/chouka/gen_pool.lua，包含：
+ * 生成 scripts/lua/chouka/90_gen/gen_pool.lua，包含：
  *   ChoukaDrawTierWeights   四档权重
  *   ChoukaUnitCategory      类型名 → 类别（1步兵 2载具 3空军 4海军 5两栖）
  *   ChoukaDrawPoolBySide    [阵营][档] = { 类型名, ... }

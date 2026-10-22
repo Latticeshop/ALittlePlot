@@ -67,7 +67,7 @@ if ChoukaAIAIProbeWorks == nil and type(EvaluateCondition) == "function" then
         end
     end
     if CHOUKA_AI_DEBUG == 1 and ChoukaAIAIProbeWorks == 0 then
-        _ALERT(ChoukaT.aiPersona)
+        ChoukaAlert(ChoukaT.aiPersona)
     end
 end
 
@@ -113,13 +113,32 @@ function ChoukaAIIsComputer(index)
     ChoukaAIIsComputerCache[index] = verdict
     if verdict == 1 and CHOUKA_AI_DEBUG == 1 and ChoukaAIReportedAI[index] ~= 1 then
         ChoukaAIReportedAI[index] = 1
-        _ALERT(format(ChoukaT.aiDetected, index))
+        ChoukaAlert(format(ChoukaT.aiDetected, ChoukaPlayerDisplayName(index)))
     end
     return verdict
 end
 
 -- ---------------- ① 电脑每回合免费抽 1 个单位 ----------------
 
+-- 这个座位还在打吗？起重机 = 本图的"水晶"（和 08_oilfield 的判据一致）。
+--   ★ 实测：电脑被打掉起重机后，出局玩家的 unit spawn 依然生效，
+--     所以"死了还在造兵"。抽兵前必须先过这道门。
+function ChoukaAISeatAlive(index)
+    if type(GetObjectByScriptName) ~= "function" then
+        return 1
+    end
+    local crane = GetObjectByScriptName("crane" .. index)
+    if crane == nil then
+        return 0
+    end
+    if type(ObjectIsAlive) == "function" then
+        if ObjectIsAlive(crane) then
+            return 1
+        end
+        return 0
+    end
+    return 1
+end
 function ChoukaAIStartPos(index)
     local wp = exWaypointGetPos("Player_" .. index .. "_Start")
     if wp ~= nil and wp[1] ~= nil then
@@ -134,6 +153,10 @@ end
 
 function ChoukaAIDrawOne(index)
     if type(ChoukaSpawnUnit) ~= "function" then
+        return 0
+    end
+    -- ★ 已出局（起重机被打掉）的座位不再出兵
+    if ChoukaAISeatAlive(index) ~= 1 then
         return 0
     end
     local x, y, z = ChoukaAIStartPos(index)
@@ -195,12 +218,12 @@ if CHOUKA_AI_AUTO_DRAW == 1 and aiRoundChanged then
     local perSeat = ChoukaAIDrawCount(CHOUKA_ROUND)
     local drawnCount = 0
     for i = 1, 6, 1 do
-        if ChoukaAIIsComputer(i) == 1 then
+        if ChoukaAIIsComputer(i) == 1 and ChoukaAISeatAlive(i) == 1 then
             drawnCount = drawnCount + ChoukaAIDrawMany(i, perSeat)
         end
     end
     if drawnCount > 0 and CHOUKA_AI_DEBUG == 1 then
-        _ALERT(format(ChoukaT.aiDrawInfo,
+        ChoukaAlert(format(ChoukaT.aiDrawInfo,
             CHOUKA_ROUND, perSeat, drawnCount, ChoukaAutoLevelForRound(CHOUKA_ROUND)))
     end
 end
@@ -305,7 +328,7 @@ if CHOUKA_AI_JOIN_NEUTRAL == 1 or CHOUKA_AI_FORCE_PLAYER_ATTACK == 1 then
     if ChoukaAIScanTick == 1 or mod(ChoukaAIScanTick, CHOUKA_AI_SCAN_SECONDS) == 0 then
         local joinedCount = ChoukaAIScanUnits()
         if joinedCount > 0 and CHOUKA_AI_DEBUG == 1 then
-            _ALERT(format(ChoukaT.aiAttackQueue, joinedCount))
+            ChoukaAlert(format(ChoukaT.aiAttackQueue, joinedCount))
         end
     end
 end

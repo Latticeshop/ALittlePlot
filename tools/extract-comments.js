@@ -42,7 +42,24 @@ function codeFingerprint(lines) {
     return crypto.createHash('sha1').update(kept.join('\n'), 'utf8').digest('hex');
 }
 
-const files = fs.readdirSync(LUA_DIR).filter(f => f.endsWith('.lua') && GENERATED.indexOf(f) < 0).sort();
+/**
+ * 递归列出 chouka 下所有 lua —— 现在按职责分了 9 个子目录
+ * （00_core / 10_boot / 20_economy / 30_world / 40_draw / 50_ui / 60_ai / 70_bang / 90_gen）。
+ * 锚点标签仍用**文件名**（§00_init-1），所以 lua 里已有的指针不受目录调整影响。
+ */
+function listLuaFiles(dir, prefix) {
+    const out = [];
+    const entries = fs.readdirSync(dir, { withFileTypes: true })
+        .sort((a, b) => a.name.localeCompare(b.name));
+    for (const ent of entries) {
+        const rel = prefix ? prefix + '/' + ent.name : ent.name;
+        if (ent.isDirectory()) out.push(...listLuaFiles(path.join(dir, ent.name), rel));
+        else if (ent.name.endsWith('.lua')) out.push({ rel, name: ent.name });
+    }
+    return out;
+}
+
+const files = listLuaFiles(LUA_DIR, '').filter(x => GENERATED.indexOf(x.name) < 0);
 
 const doc = [];
 doc.push('# 10 · Lua 注释存档（从 lua 里搬出来的大段说明）');
@@ -59,8 +76,9 @@ let totalBefore = 0, totalAfter = 0, movedBlocks = 0, movedBytes = 0;
 const report = [];
 const pending = [];        // 待落盘（指纹校验通过才写）
 
-for (const f of files) {
-    const p = path.join(LUA_DIR, f);
+for (const entry of files) {
+    const f = entry.name;
+    const p = path.join(LUA_DIR, entry.rel);
     const raw = fs.readFileSync(p, 'utf8');
     const before = Buffer.byteLength(raw, 'utf8');
     const lines = raw.replace(/\r\n/g, '\n').split('\n');
@@ -116,7 +134,7 @@ for (const f of files) {
     report.push([f, before, after, docBlocks.length]);
     pending.push({ p, out });
 
-    doc.push(`## ${f}`);
+    doc.push(`## ${entry.rel}`);
     doc.push('');
     for (const b of docBlocks) {
         doc.push(`### §${b.tag}（原第 ${b.from}~${b.to} 行）`);

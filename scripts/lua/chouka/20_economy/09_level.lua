@@ -62,7 +62,7 @@ function ChoukaAutoLevelTick(round)
         -- 只在"当前等级更低"时升级，绝不把已经买上去的等级压下来
         if round >= atRound and ChoukaDrawLevel < level then
             ChoukaDrawLevel = level
-            _ALERT(format(ChoukaT.levelAutoUp, level))
+            ChoukaAlert(format(ChoukaT.levelAutoUp, level))
         end
     end
 end
