@@ -1,9 +1,9 @@
 -- ============================================================
--- 三国杀 · 胜负判定与结算
--- 详见 docs/11-三国杀模式方案.md §9 §10
---   出局 = 自己的起重机没了（01_income / 02_private_box / 05_dog 早就在按这条跳过座位，
---          所以这里只负责「记录死亡 + 公开身份 + 判胜负」，不需要 PLAYER_KILL 阵亡者）
---   胜负照赤壁 checkGameEnd（Bang_162_code:2-49），但做了两处修正，见 §9③
+-- 三国杀 · 胜负判定与结算      详见 docs/11 §9 §10
+--   出局 = 起重机没了（含"玩家直接退出"：04_seat.lua 的守卫看到归属变了就引爆起重机，
+--   所以退出与被打死在本文里表现一致，遗物不转交队友）。
+--   本文件只负责「记录死亡 + 公开身份 + 判胜负」，不需要 PLAYER_KILL 阵亡者。
+-- 详见 docs/10-Lua注释存档.md §33_bang_win-1
 -- ============================================================
 
 ChoukaMarkNodeReady("三国杀-胜负")
@@ -15,12 +15,27 @@ CHOUKA_BANG_RES_NONE    = "none"
 
 ChoukaBangEliminated = ChoukaBangEliminated or {}
 
+-- 某个座位还活着吗？
+-- ★ 权威实现在 00_core/04_seat.lua：起重机存在 ∧ 存活 ∧ 归属仍是本人。
+--   只看 ObjectIsAlive 的老写法会把"退出后资产被移交给队友"的人当成活的（作者实测 bug），
+--   现在退出/被工程师刷漆都会被守卫引爆起重机，于是这里自然变成"死了"。
 function ChoukaBangSeatAlive(seat)
-    local crane = GetObjectByScriptName("crane" .. seat)
-    if ObjectIsAlive(crane) then
-        return 1
+    if type(ChoukaSeatAlive) == "function" then
+        return ChoukaSeatAlive(seat)
     end
-    return 0
+    -- 兜底（04_seat 没加载）：老逻辑 + 归属校验
+    local crane = GetObjectByScriptName("crane" .. seat)
+    if crane == nil or not ObjectIsAlive(crane) then
+        return 0
+    end
+    if type(ObjectPlayerScriptName) == "function" then
+        local owner = ObjectPlayerScriptName(crane)
+        if owner ~= nil and owner ~= "" and strsub(owner, 1, 7) == "Player_"
+            and owner ~= ("Player_" .. seat) then
+            return 0
+        end
+    end
+    return 1
 end
 
 function ChoukaBangResultText(code)
@@ -38,12 +53,14 @@ end
 function ChoukaBangAnnounceEliminations()
     local n = getn(ChoukaBangSeats)
     local i, seat, role
+    local newlyDead = 0
     for i = 1, n, 1 do
         seat = ChoukaBangSeats[i]
         role = ChoukaBangRole[seat]
         if role ~= nil and ChoukaBangEliminated[seat] ~= 1 then
             if ChoukaBangSeatAlive(seat) ~= 1 then
                 ChoukaBangEliminated[seat] = 1
+                newlyDead = 1
                 -- ★ 全图通报（日志 + 左下消息区 + 公屏三路，见 00_core/00_alert.lua 的 ChoukaAlertFor）
                 --   赤壁的原始形式是把身份写进记分板那一行（Bang_159_code:401-403），
                 --   本图记分板没有身份位，所以改成公屏通报，效果等价且更直白。
@@ -51,6 +68,10 @@ function ChoukaBangAnnounceEliminations()
                 _LOG("三国杀：阵亡通报 —— Player_" .. seat .. " 身份 " .. role)
             end
         end
+    end
+    -- 刚有人阵亡 → 把正开着的结盟/身份面板重画一遍，让"已阵亡者的身份"立刻点亮
+    if newlyDead == 1 and type(ChoukaPanelRefreshAllOpen) == "function" then
+        ChoukaPanelRefreshAllOpen()
     end
     return 1
 end

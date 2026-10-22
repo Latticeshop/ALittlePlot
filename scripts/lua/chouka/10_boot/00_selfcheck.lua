@@ -17,9 +17,17 @@ if ChoukaSelfCheckTick == 1 or mod(ChoukaSelfCheckTick, 10) == 0 then
     if CHOUKA_BOX_LEFT ~= nil then
         boxLeft = CHOUKA_BOX_LEFT
     end
+    -- ★ 抽卡等级是每人一份（09_level.lua），心跳里拼成 "1,1,1,1,1,1"
     local level = "nil"
-    if ChoukaDrawLevel ~= nil then
-        level = ChoukaDrawLevel
+    if type(ChoukaLevelGet) == "function" then
+        level = ""
+        for i = 1, 6, 1 do
+            if level == "" then
+                level = "" .. ChoukaLevelGet("Player_" .. i)
+            else
+                level = level .. "," .. ChoukaLevelGet("Player_" .. i)
+            end
+        end
     end
     local hud = "no"
     if ChoukaHudReady == 1 then

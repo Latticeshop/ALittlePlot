@@ -159,8 +159,11 @@ function ChoukaOilSpawnNeutral(name, pos, wantType)
     return nil
 end
 
--- 某位玩家的起重机还活着吗
+-- 某位玩家还在场上吗（起重机存在 ∧ 存活 ∧ 归属仍是本人，权威实现见 00_core/04_seat.lua）
 function ChoukaOilCraneAlive(seat)
+    if type(ChoukaSeatAlive) == "function" then
+        return ChoukaSeatAlive(seat)
+    end
     local crane = GetObjectByScriptName("crane" .. seat)
     if crane == nil then
         return 0

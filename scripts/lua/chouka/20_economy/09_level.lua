@@ -1,12 +1,15 @@
 -- ============================================================
--- 详见 docs/10-Lua注释存档.md §09_level-1
+-- 抽卡等级：★ 每个玩家一份，互相不影响（接口一律按 playerName 取）
+--   自动升级（回合 5/10/15/20）是"给每人抬到该回合的保底等级"，只升不降。
+-- 详见 docs/10-Lua注释存档.md §09_level-1 §09_level-2
 -- ============================================================
 
 ChoukaMarkNodeReady("初始化")
 
 CHOUKA_MAX_LEVEL = 8
 
-ChoukaDrawLevel = 1
+-- 玩家名 → 等级（没写过的按 1 级算）
+ChoukaDrawLevelOf = ChoukaDrawLevelOf or {}
 
 -- 各级各档概率（%），键 1~5 对应 T1~T5
 ChoukaLevelWeights = {
@@ -40,6 +43,40 @@ ChoukaAutoLevelRound = {
     [5] = 20,
 }
 
+-- ============================================================
+-- 按玩家的读写接口（其它脚本一律走这三个，别再碰全局）
+-- ============================================================
+
+-- 某个玩家当前的抽卡等级（没记录 = 1）
+function ChoukaLevelGet(playerName)
+    if playerName == nil then
+        return 1
+    end
+    local level = ChoukaDrawLevelOf[playerName]
+    if level == nil or level < 1 then
+        return 1
+    end
+    if level > CHOUKA_MAX_LEVEL then
+        return CHOUKA_MAX_LEVEL
+    end
+    return level
+end
+
+-- 直接设定某个玩家的等级（夹在 1~CHOUKA_MAX_LEVEL 之间），返回最终等级
+function ChoukaLevelSet(playerName, level)
+    if playerName == nil or level == nil then
+        return 0
+    end
+    if level < 1 then
+        level = 1
+    end
+    if level > CHOUKA_MAX_LEVEL then
+        level = CHOUKA_MAX_LEVEL
+    end
+    ChoukaDrawLevelOf[playerName] = level
+    return level
+end
+
 function ChoukaGetLevelWeights(level)
     local weights = ChoukaLevelWeights[level]
     if weights == nil then
@@ -53,27 +90,47 @@ function ChoukaGetLevelPrice(level)
     return ChoukaLevelPrice[level]
 end
 
--- 每刷一轮箱子（回合 +1）后调用：到点自动升级 + 全图播报
+-- ============================================================
+-- 自动升级：每刷一轮箱子（回合 +1）后调用
+--   把**每个玩家**抬到该回合的保底等级（只升不降），并私聊告知本人。
+--   已经是更高等级的玩家不受影响 —— 买上去的等级不会被打回去。
+-- ============================================================
+
 function ChoukaAutoLevelTick(round)
     if round == nil then
         return
     end
-    for level, atRound in ChoukaAutoLevelRound do
-        -- 只在"当前等级更低"时升级，绝不把已经买上去的等级压下来
-        if round >= atRound and ChoukaDrawLevel < level then
-            ChoukaDrawLevel = level
-            ChoukaAlert(format(ChoukaT.levelAutoUp, level))
+    local i, name, current, target, level, atRound
+    for i = 1, 6, 1 do
+        name = "Player_" .. i
+        current = ChoukaLevelGet(name)
+        target = current
+        for level, atRound in ChoukaAutoLevelRound do
+            if round >= atRound and level > target then
+                target = level
+            end
+        end
+        if target > current then
+            ChoukaLevelSet(name, target)
+            ChoukaTellPlayer(name, format(ChoukaT.levelAutoUp, target))
+            _LOG("抽卡等级自动升级：" .. name .. " Lv." .. current .. " → Lv." .. target)
         end
     end
 end
 
--- 升一级（购买）。返回 1=成功 / 0=失败，第二个返回是提示文字
+-- 升一级（购买，只影响掏钱的人）。返回 1=成功 / 0=失败，第二个返回是提示文字
 function ChoukaBuyLevel(playerName)
-    local nextLevel = ChoukaDrawLevel + 1
+    if playerName == nil then
+        return 0, ""
+    end
+
+    local current = ChoukaLevelGet(playerName)
+    local nextLevel = current + 1
     local price = ChoukaGetLevelPrice(nextLevel)
     if price == nil then
-        return 0, format(ChoukaT.levelMax, ChoukaDrawLevel)
+        return 0, format(ChoukaT.levelMax, current)
     end
+
     local money = exPlayerGetCurrentMoney(playerName)
     if money == nil then
         money = 0
@@ -81,7 +138,8 @@ function ChoukaBuyLevel(playerName)
     if money < price then
         return 0, format(ChoukaT.levelNoMoney, nextLevel, price)
     end
+
     ExecuteAction("PLAYER_GIVE_MONEY", playerName, -price)
-    ChoukaDrawLevel = nextLevel
-    return 1, format(ChoukaT.levelUp, ChoukaDrawLevel)
+    ChoukaLevelSet(playerName, nextLevel)
+    return 1, format(ChoukaT.levelUp, nextLevel)
 end

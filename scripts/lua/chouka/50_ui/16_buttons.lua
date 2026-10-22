@@ -197,7 +197,11 @@ function ChoukaShowMarketDialog(playerName)
     if index == nil then
         return
     end
-    local level = ChoukaDrawLevel or 1
+    -- ★ 等级按玩家独立（09_level.lua）：看的是"你自己"的等级，别人买了不影响你
+    local level = 1
+    if type(ChoukaLevelGet) == "function" then
+        level = ChoukaLevelGet(playerName)
+    end
     local nextPrice = nil
     if ChoukaGetLevelPrice ~= nil then
         nextPrice = ChoukaGetLevelPrice(level + 1)

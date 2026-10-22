@@ -150,37 +150,67 @@ end
 local hudRemainMinutes = floor(CHOUKA_BOX_LEFT / 60)
 local hudRemainSeconds = CHOUKA_BOX_LEFT - hudRemainMinutes * 60
 
-local hudLevel = ChoukaDrawLevel or 1
-local hudWeights = nil
-if ChoukaGetLevelWeights ~= nil then
-    hudWeights = ChoukaGetLevelWeights(hudLevel)
+-- 概率文案：某个等级对应的五档概率（等级按玩家独立，所以每人一份）
+-- ⚠ Lua 4.0 没有 `local function`，只能写成 local x = function(...)
+local ChoukaHudProbTextOf = function(level)
+    local weights = nil
+    if ChoukaGetLevelWeights ~= nil then
+        weights = ChoukaGetLevelWeights(level)
+    end
+    if weights == nil then
+        weights = ChoukaDrawTierWeights or { 100, 0, 0, 0, 0 }
+    end
+    return format("T1 %d%%  T2 %d%%  T3 %d%%  T4 %d%%  T5 %d%%",
+        weights[1] or 0, weights[2] or 0, weights[3] or 0,
+        weights[4] or 0, weights[5] or 0)
 end
-if hudWeights == nil then
-    hudWeights = ChoukaDrawTierWeights or { 100, 0, 0, 0, 0 }
+
+-- 取某个玩家的等级（接口缺失时退回 1 级）
+local ChoukaHudLevelOf = function(playerName)
+    if type(ChoukaLevelGet) == "function" then
+        return ChoukaLevelGet(playerName)
+    end
+    return 1
 end
 
 local hudCountdownText = format("%02d:%02d", hudRemainMinutes, hudRemainSeconds)
-local hudProbText = format("T1 %d%%  T2 %d%%  T3 %d%%  T4 %d%%  T5 %d%%",
-    hudWeights[1] or 0, hudWeights[2] or 0, hudWeights[3] or 0,
-    hudWeights[4] or 0, hudWeights[5] or 0)
 
--- ① 右上角：每人一行单位数 + 回合/倒计时/等级/概率
+-- ① 右上角：每人一行单位数 + 回合/倒计时；等级/概率每人一份（自己的等级只有自己看得到）
 if ChoukaHudScoreBoardReady == 1 then
     for i = 1, 6, 1 do
         local crane = GetObjectByScriptName((ChoukaCranePrefix or "crane") .. i)
         local count = 0
-        if ObjectIsAlive(crane) then
+        local seatAlive = 0
+        if type(ChoukaSeatAlive) == "function" then
+            seatAlive = ChoukaSeatAlive(i)
+        elseif ObjectIsAlive(crane) then
+            seatAlive = 1
+        end
+        if seatAlive == 1 then
             count = ChoukaHudCountUnits(crane)
         end
         exScoreBoardSetText(format("  %d", count), i, 2)
     end
     exScoreBoardSetText(format("%d", hudRound), 7, 2)
     exScoreBoardSetText(hudCountdownText, 8, 2)
-    exScoreBoardSetText(format("Lv.%d", hudLevel), 9, 2)
-    exScoreBoardSetText(hudProbText, 10, 2)
+
+    -- ★ 抽卡等级是每人的（09_level.lua），所以第 9/10 行要按玩家分别写：
+    --   有 exScoreBoardSetTextForPlayer 就一人一份，没有就退回全局写 1 号位（只是看不到别人那份）
+    if type(exScoreBoardSetTextForPlayer) == "function" then
+        for i = 1, 6, 1 do
+            local playerName = "Player_" .. i
+            local myLevel = ChoukaHudLevelOf(playerName)
+            exScoreBoardSetTextForPlayer(playerName, format("Lv.%d", myLevel), 9, 2)
+            exScoreBoardSetTextForPlayer(playerName, ChoukaHudProbTextOf(myLevel), 10, 2)
+        end
+    else
+        local firstLevel = ChoukaHudLevelOf("Player_1")
+        exScoreBoardSetText(format("Lv.%d", firstLevel), 9, 2)
+        exScoreBoardSetText(ChoukaHudProbTextOf(firstLevel), 10, 2)
+    end
 end
 
--- ② 左下角：只给真人玩家画（AI 座位没有客户端）
+-- ② 左下角：只给真人玩家画（AI 座位没有客户端），内容用各自的等级
 for i = 1, 6, 1 do
     local isHuman = 0
     if type(EvaluateCondition) == "function" then
@@ -192,10 +222,11 @@ for i = 1, 6, 1 do
     end
     if isHuman == 1 and ChoukaHudCreateForPlayer(i) == 1 then
         local playerName = "Player_" .. i
+        local myLevel = ChoukaHudLevelOf(playerName)
         ChoukaHudUpdateText(playerName, CHOUKA_HUD_ROUND_INDEX, format("回合数：%d", hudRound))
         ChoukaHudUpdateText(playerName, CHOUKA_HUD_COUNTDOWN_INDEX, ChoukaT.hudCountdown .. hudCountdownText)
-        ChoukaHudUpdateText(playerName, CHOUKA_HUD_LEVEL_INDEX, format("抽卡等级：Lv.%d", hudLevel))
-        ChoukaHudUpdateText(playerName, CHOUKA_HUD_PROB1_INDEX, hudProbText)
+        ChoukaHudUpdateText(playerName, CHOUKA_HUD_LEVEL_INDEX, format("抽卡等级：Lv.%d", myLevel))
+        ChoukaHudUpdateText(playerName, CHOUKA_HUD_PROB1_INDEX, ChoukaHudProbTextOf(myLevel))
     end
 end
 

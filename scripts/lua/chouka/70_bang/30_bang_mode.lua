@@ -103,14 +103,21 @@ function ChoukaBangSeatOfName(playerName)
     return nil
 end
 
--- 参战座位 = 起重机活着（与 01_income:35 / 02_private_box:551 / 05_dog:54 同一条链）
+-- 参战座位 = 起重机活着且归属还是本人（与 01_income / 02_private_box / 05_dog 同一条链；
+-- 归属校验见 00_core/04_seat.lua：退出/被占领不算参战）
 -- AI 天然包含；空位不出现起重机，所以数量 = 真实参战人数
 function ChoukaBangCollectSeats()
     ChoukaBangSeats = {}
-    local i, crane
+    local i, crane, alive
     for i = 1, 6, 1 do
         crane = GetObjectByScriptName("crane" .. i)
-        if ObjectIsAlive(crane) then
+        alive = 0
+        if type(ChoukaSeatAlive) == "function" then
+            alive = ChoukaSeatAlive(i)
+        elseif ObjectIsAlive(crane) then
+            alive = 1
+        end
+        if alive == 1 then
             tinsert(ChoukaBangSeats, i)
         end
     end

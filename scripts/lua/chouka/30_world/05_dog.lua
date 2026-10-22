@@ -49,12 +49,18 @@ function ChoukaEngineerFilter()
     return ChoukaEngineerFilterCache
 end
 
--- 返回 -1 = 这条座位已经出局（起重机没了，别补）；否则返回手上的工程师个数
+-- 返回 -1 = 这条座位已经出局（起重机没了/被移交，别补）；否则返回手上的工程师个数
 function ChoukaDogCountEngineers(playerIndex)
-    local crane = GetObjectByScriptName("crane" .. playerIndex)
-    if not ObjectIsAlive(crane) then
+    local seatAlive = 1
+    if type(ChoukaSeatAlive) == "function" then
+        seatAlive = ChoukaSeatAlive(playerIndex)
+    elseif not ObjectIsAlive(GetObjectByScriptName("crane" .. playerIndex)) then
+        seatAlive = 0
+    end
+    if seatAlive ~= 1 then
         return -1
     end
+    local crane = GetObjectByScriptName("crane" .. playerIndex)
     local units, count = ObjectFindObjects(crane, nil, ChoukaEngineerFilter())
     if count == nil then
         return 0

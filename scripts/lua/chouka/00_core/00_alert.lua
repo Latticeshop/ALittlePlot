@@ -56,6 +56,22 @@ function ChoukaAlertFor(msg, seconds)
     end
 end
 
+-- ③ 只给某个玩家播一条（左下消息区私有），没有私有接口就只写日志
+--    用途：抽卡等级自动升级、身份偏好提示这类"只关他一个人"的消息
+function ChoukaTellPlayer(playerName, text, seconds)
+    if playerName == nil or text == nil then
+        return 0
+    end
+    if type(exAddTextToPublicBoardForPlayer) == "function" then
+        if seconds == nil then
+            seconds = 8
+        end
+        exAddTextToPublicBoardForPlayer(playerName, text, seconds)
+    end
+    _LOG("[" .. playerName .. "] " .. text)
+    return 1
+end
+
 -- 真实昵称缓存：exGetPlayerNickNameByScriptName 查到的玩家名（查一次就记住）
 ChoukaPlayerNames = ChoukaPlayerNames or {}
 

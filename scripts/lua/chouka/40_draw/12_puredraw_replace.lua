@@ -540,12 +540,16 @@ function ChoukaChooseUnit(playerName, onWater, level)
         return nil
     end
 
-    -- 概率表由抽卡等级决定（09_level.lua）；等级系统缺失时退回固定档权重
-    -- level 参数给 AI 用：电脑只按"自动升级"那条线走，不受玩家购买等级影响（17_ai.lua）
+    -- 概率表由抽卡等级决定（09_level.lua，等级按玩家独立）；level 参数只给 AI 用
     local weights = nil
     if ChoukaGetLevelWeights ~= nil then
         if level == nil then
-            level = ChoukaDrawLevel or 1
+            -- 没显式给等级 = 玩家自己碰箱子抽卡 → 用他本人的等级（见 docs/10 §09_level-2）
+            if type(ChoukaLevelGet) == "function" then
+                level = ChoukaLevelGet(playerName)
+            else
+                level = 1
+            end
         end
         weights = ChoukaGetLevelWeights(level)
     end

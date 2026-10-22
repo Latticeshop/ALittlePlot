@@ -549,9 +549,14 @@ end
 
 for i = 1, 6, 1 do
     local playerName = "Player_" .. i
-    -- 起重机还在 = 这个座位还在场上（起重机被摧毁时该玩家直接判负）
-    local crane = GetObjectByScriptName("crane" .. i)
-    if ObjectIsAlive(crane) then
+    -- 起重机还在且归属还是本人 = 这个座位还在场上（04_seat.lua；退出/被占领也算出局）
+    local seatAlive = 0
+    if type(ChoukaSeatAlive) == "function" then
+        seatAlive = ChoukaSeatAlive(i)
+    elseif ObjectIsAlive(GetObjectByScriptName("crane" .. i)) then
+        seatAlive = 1
+    end
+    if seatAlive == 1 then
         local team = playerName .. "/team" .. playerName
         local wp1 = "box" .. i .. "1"
         local wp2 = "box" .. i .. "2"

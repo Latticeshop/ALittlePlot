@@ -51,10 +51,18 @@ function ChoukaCenterCrateOwner(wp)
 
     local best = 0
     local bestDist = nil
-    local i, crane, cx, cy, dx, dy, dist
+    local i, crane, cx, cy, dx, dy, dist, seatAlive
     for i = 1, 6, 1 do
         crane = GetObjectByScriptName("crane" .. i)
-        if crane ~= nil and ObjectIsAlive(crane) then
+        seatAlive = 0
+        if crane ~= nil then
+            if type(ChoukaSeatAlive) == "function" then
+                seatAlive = ChoukaSeatAlive(i)
+            elseif ObjectIsAlive(crane) then
+                seatAlive = 1
+            end
+        end
+        if seatAlive == 1 then
             cx, cy = ObjectGetPosition(crane)
             if cx ~= nil and cy ~= nil then
                 dx = p[1] - cx

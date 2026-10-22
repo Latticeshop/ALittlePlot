@@ -1,47 +1,40 @@
 -- ============================================================
--- 三国杀 · 身份偏好（复用原生选择页 + 文字选项）
--- 详见 docs/11-三国杀模式方案.md §5
---
--- 作者 2026-10 定案：**不要自绘卡片和图标**，直接用游戏原生的
--- `exShowCustomBtnChoiceDialogForPlayer`（和房主配置页、交易市场同一个控件），
--- 一屏 5 个文字选项：
---     主公（名额 1） / 忠臣（名额 1） / 反贼（名额 2） / 内奸（名额 1） / 弃权（随机分配）
---
--- 交互 = 一步到位：点哪个就是哪个（原生选择页点完自动关），没有"再点确认"那一步。
---
--- ★★ 关键教训（2026-10 实测）：**只给真人弹面板，绝不能给 AI 座位弹。**
---    第一版给全部 6 个座位都弹了，结果真人还没选，自己那份面板就被"别人"关掉了。
---    原因：按钮选择对话框在引擎里只有一个"当前显示位"，
---      · 给另一个座位 Show 一次，就会把屏幕上正开着的那份顶掉；
---      · 任何一个座位应答，`exHideCustomBtnChoiceDialogForPlayer` 收掉的也是同一份。
---    所以 AI 座位一律不弹 —— 它们的身份直接随机（正好是它们本来的行为）。
+-- 三国杀 · 身份偏好（原生选择页 + 文字选项），详见 docs/11 §5
+--   ★ 每人一份独立面板：面板 id = 730 + 座位号；等**所有人选完**才发身份开局；
+--     没选的人每 2 秒重弹一次自己的面板；保险丝到点按弃权收口。
+-- 详见 docs/10-Lua注释存档.md §32_bang_pref-1
 -- ============================================================
 
 ChoukaMarkNodeReady("三国杀-偏好")
 
 -- ---------------- 常量 ----------------
 
--- 原生选择页 id。已占用：700+序号=交易市场(701~706)、710+序号=防御塔(711~716)、
---                      810=开局公告长文本、811=房主配置页
+-- 原生选择页 id 基址。已占用：700+序号=交易市场(701~706)、710+序号=防御塔(711~716)、
+--                          810=开局公告长文本、811=房主配置页、730+序号=身份偏好(731~736)
 CHOUKA_BANG_PREF_DIALOG       = 730
 
-CHOUKA_BANG_PREF_SECONDS      = CHOUKA_BANG_PREF_SECONDS or 180
+-- 保险丝：到点还没选完就按弃权收口（0 = 不设保险丝，只等所有人选完）
+CHOUKA_BANG_PREF_SECONDS      = CHOUKA_BANG_PREF_SECONDS or 300
 
--- ★ 提前收尾：只要真人选过，再静默这么多秒就结束
---   （现在是"真人一选就立刻收尾"，这条只在将来多真人时兜底）
-CHOUKA_BANG_PREF_GRACE        = CHOUKA_BANG_PREF_GRACE or 15
+-- AI 座位的宽限：给它们这么多秒"假装在考虑"，然后自动弃权（真人不受影响）
+CHOUKA_BANG_PREF_AI_GRACE     = CHOUKA_BANG_PREF_AI_GRACE or 6
 
--- 还没选的话，每隔这么多秒重新弹一次面板（玩家把面板点叉了也能再拿到）
-CHOUKA_BANG_PREF_REOPEN_EVERY = CHOUKA_BANG_PREF_REOPEN_EVERY or 30
+-- 静默兜底：已经有人作答之后，还没作答的座位再等这么多秒就按弃权（0 = 关掉这条）
+--   用途：认不出的电脑座位不会点面板，不能让人干等 300 秒保险丝
+CHOUKA_BANG_PREF_SILENT       = CHOUKA_BANG_PREF_SILENT or 60
+
+-- 还没选的话，每隔这么多秒重新弹一次面板（玩家把面板点叉了也能马上再拿到）
+--   参考官渡：偏好对话框是在节点体里**每次求值都重弹**的，所以永远不会被关掉就再也出不来
+CHOUKA_BANG_PREF_REOPEN_EVERY = CHOUKA_BANG_PREF_REOPEN_EVERY or 2
 
 -- ---------------- 状态（全局：Lua 桥的闭包拿不到外层 local） ----------------
 
 ChoukaBangPref              = ChoukaBangPref or {}         -- playerName -> 想要的身份
 ChoukaBangReady             = ChoukaBangReady or {}        -- playerName -> 1 已选过
-ChoukaBangPrefPlayers       = ChoukaBangPrefPlayers or {}  -- 真正弹了面板的座位（= 真人座位）
+ChoukaBangPrefPlayers       = ChoukaBangPrefPlayers or {}  -- 要等的人（参战座位，电脑也在内，会自动弃权）
 ChoukaBangPrefHumanPlayers  = ChoukaBangPrefHumanPlayers or {}
+ChoukaBangPrefAiPlayers     = ChoukaBangPrefAiPlayers or {}-- 其中判定为电脑的座位
 ChoukaBangPrefTick          = ChoukaBangPrefTick or 0
-ChoukaBangPrefLastReadyTick = ChoukaBangPrefLastReadyTick or 0
 ChoukaBangPrefUiCreated     = ChoukaBangPrefUiCreated or {}
 ChoukaBangPrefNoApiWarned   = ChoukaBangPrefNoApiWarned or 0
 
@@ -67,49 +60,105 @@ function ChoukaBangPrefQuotaOf(role)
 end
 
 -- ============================================================
--- 找出"该弹面板的座位"
---
--- 本图唯一可靠的真人接口是 `ObjectPlayerScriptName("<1st Human Player>")`
--- （03_start.lua:105-106 就是这么认出房主的 —— 房主配置页确实弹给了真人，
---   证明这条路是通的）。`EvaluateCondition(..., "Human")` 在本图返回空，
--- 那正是第一版"零真人 → 偏好被静默跳过"的真凶，别再用它。
+-- 座位 ↔ 玩家名
 -- ============================================================
 
-function ChoukaBangPrefPushSeat(list, name)
-    if name == nil or name == "" then
-        return
+function ChoukaBangPrefSeatOfName(playerName)
+    if playerName == nil then
+        return nil
     end
-    local i
-    for i = 1, getn(list), 1 do
-        if list[i] == name then
-            return
+    if strsub(playerName, 1, 7) ~= "Player_" then
+        return nil
+    end
+    return tonumber(strsub(playerName, 8))
+end
+
+-- 某个座位对应的面板 id（每人一份，绝不共用）
+function ChoukaBangPrefDialogOf(seat)
+    return CHOUKA_BANG_PREF_DIALOG + seat
+end
+
+-- 从面板 id 反推座位（不是我们的一律返回 nil）
+function ChoukaBangPrefSeatOfDialog(dialogId)
+    if dialogId == nil then
+        return nil
+    end
+    local seat = dialogId - CHOUKA_BANG_PREF_DIALOG
+    if seat < 1 or seat > 6 then
+        return nil
+    end
+    return seat
+end
+
+-- ============================================================
+-- 要等哪些人：全部参战座位（ChoukaBangSeats），AI 座位弹了无害、宽限后自动弃权。
+-- 真人识别完全失灵时一个都不自动弃权（宁可等保险丝，也不能把真人当 AI 提前收口）。
+-- 详见 docs/10-Lua注释存档.md §32_bang_pref-1
+-- ============================================================
+
+-- 这座位是电脑吗（电脑不会点面板，只能被自动记成弃权）
+--   ① 作者显式配置的 CHOUKA_AI_SLOTS 最可靠；
+--   ② 否则问人格条件（和 17_ai.lua 同一条判据）；
+--   ③ 都判不出来就当"人"——宁可等，也不要把真人当电脑提前收口。
+function ChoukaBangPrefIsAi(seat)
+    if seat == nil then
+        return 0
+    end
+    local name = "Player_" .. seat
+    if type(CHOUKA_AI_SLOTS) == "table" then
+        if CHOUKA_AI_SLOTS[seat] == 1 then
+            return 1
         end
     end
-    tinsert(list, name)
+    -- 房主 / <1st Human Player> 一定是人（03_start 认出来的）
+    if name == ChoukaStartHost then
+        return 0
+    end
+    if type(ObjectPlayerScriptName) == "function" then
+        if ObjectPlayerScriptName("<1st Human Player>") == name then
+            return 0
+        end
+    end
+    if type(EvaluateCondition) == "function" then
+        if EvaluateCondition("PLAYER_IS_HUMAN_OR_AI_PERSONALITY", name, "AI") then
+            return 1
+        end
+    end
+    return 0
 end
 
 function ChoukaBangPrefCollectSeats()
     local out = {}
+    local i, seat, name
 
-    -- ① 第一个真人玩家
-    if type(ObjectPlayerScriptName) == "function" then
-        ChoukaBangPrefPushSeat(out, ObjectPlayerScriptName("<1st Human Player>"))
+    if type(ChoukaBangSeats) == "table" and getn(ChoukaBangSeats) > 0 then
+        for i = 1, getn(ChoukaBangSeats), 1 do
+            seat = ChoukaBangSeats[i]
+            if seat ~= nil then
+                tinsert(out, "Player_" .. seat)
+            end
+        end
+        return out
     end
 
-    -- ② 房主（03_start 认出来的那个；和上面重复会自动去重）
-    ChoukaBangPrefPushSeat(out, ChoukaStartHost)
-
-    -- ③ 全都没认出来：兜底给 Player_1（03_start.lua:112 的房主兜底值也是它）
-    if getn(out) == 0 then
-        tinsert(out, "Player_1")
-        _LOG("三国杀：偏好认不出真人，兜底只弹给 Player_1")
+    -- 参战座位还没收集（30 号节点没跑）→ 退回"有起重机的座位"
+    for seat = 1, 6, 1 do
+        name = "Player_" .. seat
+        if type(ChoukaSeatCrane) == "function" then
+            if ChoukaSeatCrane(seat) ~= nil then
+                tinsert(out, name)
+            end
+        elseif type(GetObjectByScriptName) == "function" then
+            if GetObjectByScriptName("crane" .. seat) ~= nil then
+                tinsert(out, name)
+            end
+        end
     end
-
     return out
 end
 
 -- ============================================================
--- 原生选择页
+-- 原生选择页（每人一份 id）
 -- ============================================================
 
 -- 5 个文字选项：「主公（名额 1）」…
@@ -143,7 +192,12 @@ function ChoukaBangPrefShowFor(playerName)
         return 0
     end
 
-    local args = { playerName, CHOUKA_BANG_PREF_DIALOG, ChoukaT.bangPrefTitle }
+    local seat = ChoukaBangPrefSeatOfName(playerName)
+    if seat == nil then
+        return 0
+    end
+
+    local args = { playerName, ChoukaBangPrefDialogOf(seat), ChoukaT.bangPrefTitle }
     local choices = ChoukaBangPrefOptions()
     local i
     for i = 1, getn(choices), 1 do
@@ -168,13 +222,22 @@ function ChoukaBangPrefHideFor(playerName)
     return 1
 end
 
+function ChoukaBangPrefHideAll()
+    local i
+    for i = 1, getn(ChoukaBangPrefPlayers), 1 do
+        ChoukaBangPrefHideFor(ChoukaBangPrefPlayers[i])
+    end
+    return 1
+end
+
 -- ============================================================
 -- 选择页回调（由 16_buttons.lua 的 onUserBtnChoiceDialogEvent 分发进来）
 --   签名照 03_start.lua 的 ChoukaChoice_start：(playerName, btnIndex, dialogId)
+--   面板 id = 730 + 座位 → 每个座位只认自己那份；别人的 id 一律不接
 -- ============================================================
 
 function ChoukaChoice_bangPref(playerName, btnIndex, dialogId)
-    if dialogId ~= CHOUKA_BANG_PREF_DIALOG then
+    if ChoukaBangPrefSeatOfDialog(dialogId) == nil then
         return 0
     end
 
@@ -192,23 +255,56 @@ function ChoukaChoice_bangPref(playerName, btnIndex, dialogId)
         return 1
     end
 
+    local seat = ChoukaBangPrefSeatOfName(playerName)
+    if seat == nil then
+        return 1
+    end
+
     local role = roles[btnIndex]
     ChoukaBangPref[playerName] = role
     ChoukaBangReady[playerName] = 1
-    ChoukaBangPrefLastReadyTick = ChoukaBangPrefTick or 0
     ChoukaBangPrefHideFor(playerName)
 
-    _LOG("三国杀：偏好 " .. playerName .. " 选了 " .. role .. "（立刻进入发身份）")
+    _LOG("三国杀：偏好 " .. playerName .. "（座位 " .. seat .. "）选了 " .. role)
     if type(ChoukaBangTellPlayer) == "function" then
         ChoukaBangTellPlayer(playerName, format(ChoukaT.bangPrefYouPicked, role))
+    else
+        ChoukaTellPlayer(playerName, format(ChoukaT.bangPrefYouPicked, role))
     end
+
+    -- 给所有人刷一下进度（"已选 x/y 人"），让大家知道还差谁
+    ChoukaBangPrefAnnounceProgress()
     return 1
 end
 
 -- ============================================================
--- 流程
+-- 进度 / 收尾
 -- ============================================================
 
+function ChoukaBangPrefReadyCount()
+    local i, c
+    c = 0
+    for i = 1, getn(ChoukaBangPrefPlayers), 1 do
+        if ChoukaBangReady[ChoukaBangPrefPlayers[i]] == 1 then
+            c = c + 1
+        end
+    end
+    return c
+end
+
+function ChoukaBangPrefAnnounceProgress()
+    local total = getn(ChoukaBangPrefPlayers)
+    if total == 0 then
+        return 0
+    end
+    local text = format(ChoukaT.bangPrefWait, ChoukaBangPrefReadyCount(), total)
+    _LOG("三国杀：" .. text)
+    -- 公屏播一条进度（每次有人选完才播，最多 total 条），让大家知道还差几个人
+    ChoukaAlert(text)
+    return 1
+end
+
+-- 所有要等的人都作答了吗（AI 座位由宽限逻辑提前记成弃权，所以"全部"是可达的）
 function ChoukaBangAllReady()
     local n = getn(ChoukaBangPrefPlayers)
     if n == 0 then
@@ -221,17 +317,6 @@ function ChoukaBangAllReady()
         end
     end
     return 1
-end
-
-function ChoukaBangPrefReadyCount()
-    local i, c
-    c = 0
-    for i = 1, getn(ChoukaBangPrefPlayers), 1 do
-        if ChoukaBangReady[ChoukaBangPrefPlayers[i]] == 1 then
-            c = c + 1
-        end
-    end
-    return c
 end
 
 -- 由 03_start.lua 在房主确认开局且玩法=三国杀时调用；节点体里也有一道兜底自启
@@ -251,32 +336,42 @@ function ChoukaBangBeginPreference()
 
     ChoukaBangStage = 1
     ChoukaBangPrefTick = 0
-    ChoukaBangPrefLastReadyTick = 0
     ChoukaBangPref = {}
     ChoukaBangReady = {}
     ChoukaBangPrefUiCreated = {}
+    ChoukaBangPrefAiPlayers = {}
+    ChoukaBangPrefHumanPlayers = {}
 
     if type(ChoukaBangCollectSeats) == "function" then
         ChoukaBangCollectSeats()
     end
 
-    -- ★ 只给真人座位弹面板（原因见文件头）。AI 座位不弹，身份直接随机。
     ChoukaBangPrefPlayers = ChoukaBangPrefCollectSeats()
-    ChoukaBangPrefHumanPlayers = ChoukaBangPrefPlayers
 
     local i, name
     if getn(ChoukaBangPrefPlayers) == 0 then
         ChoukaAlert(ChoukaT.bangPrefNoApi)
-        _LOG("三国杀：偏好跳过（没有真人座位可弹）")
+        _LOG("三国杀：偏好跳过（没有参战座位可弹）")
         ChoukaBangPrefDone = 1
         return 1
     end
 
+    -- 分拣：电脑座位不点面板，宽限后自动弃权；人类座位一律等（公平性）
+    for i = 1, getn(ChoukaBangPrefPlayers), 1 do
+        name = ChoukaBangPrefPlayers[i]
+        if ChoukaBangPrefIsAi(ChoukaBangPrefSeatOfName(name)) == 1 then
+            tinsert(ChoukaBangPrefAiPlayers, name)
+        else
+            tinsert(ChoukaBangPrefHumanPlayers, name)
+        end
+    end
+
+    -- 给**每个参战座位**各弹一份自己的面板（id = 730 + 座位）
     for i = 1, getn(ChoukaBangPrefPlayers), 1 do
         ChoukaBangPrefShowFor(ChoukaBangPrefPlayers[i])
     end
 
-    -- 面板没弹出来（接口缺失）→ 别干等 180 秒，直接随机
+    -- 面板没弹出来（接口缺失）→ 别干等，直接随机
     if getn(ChoukaBangPrefUiCreated) == 0 then
         _LOG("三国杀：偏好面板没弹出来，直接随机身份（不等超时）")
         ChoukaBangPrefPlayers = {}
@@ -284,11 +379,13 @@ function ChoukaBangBeginPreference()
         return 1
     end
 
-    ChoukaAlert(format(ChoukaT.bangPrefBegin, CHOUKA_BANG_PREF_SECONDS))
-    _LOG("三国杀：身份偏好面板已弹 —— 只弹给真人座位 " ..
-         getn(ChoukaBangPrefPlayers) .. " 个（" ..
-         ChoukaBangPrefPlayers[1] .. "）；参战座位 " .. getn(ChoukaBangSeats) ..
-         " 个，其余随机；最多等 " .. CHOUKA_BANG_PREF_SECONDS .. " 秒")
+    ChoukaAlert(format(ChoukaT.bangPrefBegin, 0, getn(ChoukaBangPrefPlayers)))
+    _LOG("三国杀：身份偏好开始 —— 参战座位 " .. getn(ChoukaBangPrefPlayers) ..
+         " 个（电脑 " .. getn(ChoukaBangPrefAiPlayers) ..
+         " 个，其余等真人选），每人一份面板 id " .. ChoukaBangPrefDialogOf(1) .. "~" ..
+         ChoukaBangPrefDialogOf(6) .. "，所有人选完才开局" ..
+         "（保险丝 " .. CHOUKA_BANG_PREF_SECONDS .. " 秒，静默 " ..
+         CHOUKA_BANG_PREF_SILENT .. " 秒）")
     return 1
 end
 
@@ -306,45 +403,114 @@ function ChoukaBangPrefFinish(timedOut)
             end
             ChoukaBangReady[name] = 1
         end
-        ChoukaAlert(ChoukaT.bangPrefTimeout)
+        ChoukaAlert(format(ChoukaT.bangPrefTimeout, CHOUKA_BANG_PREF_SECONDS))
     end
 
     -- 收面板（没选的人面板还开着，一起收掉）
-    for i = 1, getn(ChoukaBangPrefPlayers), 1 do
-        ChoukaBangPrefHideFor(ChoukaBangPrefPlayers[i])
-    end
+    ChoukaBangPrefHideAll()
 
     ChoukaBangPrefDone = 1
-    _LOG("三国杀：身份偏好结束（timedOut=" .. (timedOut or 0) .. "）")
+    _LOG("三国杀：身份偏好结束（timedOut=" .. (timedOut or 0) .. "，已选 " ..
+         ChoukaBangPrefReadyCount() .. "/" .. getn(ChoukaBangPrefPlayers) .. "）")
+    return 1
+end
+
+-- 座位中途没了（退出/被拆）：自动按弃权，绝不为一个已经不在的人卡住整局
+function ChoukaBangPrefSweepMissing()
+    local i, name, seat
+    for i = 1, getn(ChoukaBangPrefPlayers), 1 do
+        name = ChoukaBangPrefPlayers[i]
+        if ChoukaBangReady[name] ~= 1 then
+            seat = ChoukaBangPrefSeatOfName(name)
+            local alive = 1
+            if type(ChoukaBangSeatAlive) == "function" then
+                alive = ChoukaBangSeatAlive(seat)
+            end
+            if alive ~= 1 then
+                ChoukaBangPref[name] = ChoukaT.bangRoleAbstain
+                ChoukaBangReady[name] = 1
+                _LOG("三国杀：偏好 —— " .. name .. " 已经不在了，自动弃权")
+            end
+        end
+    end
+    return 1
+end
+
+-- 电脑座位宽限后自动弃权（真人座位一律等；见 BeginPreference 的说明）
+function ChoukaBangPrefSweepAi()
+    if ChoukaBangPrefTick < CHOUKA_BANG_PREF_AI_GRACE then
+        return 0
+    end
+    local i, name
+    for i = 1, getn(ChoukaBangPrefAiPlayers), 1 do
+        name = ChoukaBangPrefAiPlayers[i]
+        if ChoukaBangReady[name] ~= 1 then
+            ChoukaBangPref[name] = ChoukaT.bangRoleAbstain
+            ChoukaBangReady[name] = 1
+            _LOG("三国杀：偏好 —— " .. name .. " 是电脑，自动弃权")
+        end
+    end
+    return 1
+end
+
+-- 静默兜底：**已经有人作答**之后，还没作答的座位再等 CHOUKA_BANG_PREF_SILENT 秒就按弃权
+--   为什么需要它：这台机器上"人格条件"不一定认得出电脑（历史上 Human 参数直接返回空），
+--   认不出的电脑座位就会一直不点 → 只能等保险丝（300 秒），单机测起来很难受。
+--   条件写得很保守：必须先有人真的作答（证明这套面板是能点的），再给足静默时间。
+--   设成 0 = 关掉这条，完全只等所有人选完 / 保险丝。
+function ChoukaBangPrefSweepSilent()
+    if CHOUKA_BANG_PREF_SILENT <= 0 then
+        return 0
+    end
+    if ChoukaBangPrefTick < CHOUKA_BANG_PREF_SILENT then
+        return 0
+    end
+    if ChoukaBangPrefReadyCount() <= 0 then
+        return 0
+    end
+    local i, name
+    for i = 1, getn(ChoukaBangPrefPlayers), 1 do
+        name = ChoukaBangPrefPlayers[i]
+        if ChoukaBangReady[name] ~= 1 then
+            ChoukaBangPref[name] = ChoukaT.bangRoleAbstain
+            ChoukaBangReady[name] = 1
+            _LOG("三国杀：偏好 —— " .. name .. " 静默 " .. CHOUKA_BANG_PREF_SILENT .. " 秒未作答，按弃权")
+        end
+    end
     return 1
 end
 
 function ChoukaBangPrefTickOnce()
     ChoukaBangPrefTick = ChoukaBangPrefTick + 1
 
-    -- ① 该弹的座位都选过了 → 立刻收尾（单真人局：选完马上开局）
+    -- ① 座位中途没了 → 自动弃权（不然整局卡在这里）
+    ChoukaBangPrefSweepMissing()
+
+    -- ② 电脑座位宽限后自动弃权
+    ChoukaBangPrefSweepAi()
+
+    -- ③ ★ 全部作答 → 收尾（作者要求：等到所有人选完才发身份开局）
     if ChoukaBangAllReady() == 1 then
         ChoukaBangPrefFinish(0)
         return
     end
 
-    -- ② 有人选过、且已静默 GRACE 秒 → 收尾（留给将来多个真人的场景兜底）
-    if ChoukaBangPrefReadyCount() > 0 then
-        if (ChoukaBangPrefTick - (ChoukaBangPrefLastReadyTick or 0)) >= CHOUKA_BANG_PREF_GRACE then
-            _LOG("三国杀：选完静默 " .. CHOUKA_BANG_PREF_GRACE .. " 秒，偏好收尾")
-            ChoukaBangPrefFinish(0)
-            return
-        end
-    end
-
-    -- ③ 硬超时
-    if ChoukaBangPrefTick >= CHOUKA_BANG_PREF_SECONDS then
+    -- ④ 保险丝（0 = 不设保险丝，只等所有人选完）
+    if CHOUKA_BANG_PREF_SECONDS > 0 and ChoukaBangPrefTick >= CHOUKA_BANG_PREF_SECONDS then
         ChoukaBangPrefFinish(1)
         return
     end
 
-    -- ④ 没选的座位定期重弹（玩家把面板点叉了也能再拿到）
-    if mod(ChoukaBangPrefTick, CHOUKA_BANG_PREF_REOPEN_EVERY) == 0 then
+    -- ⑤ 静默兜底（认不出的电脑座位，别让人干等保险丝）
+    ChoukaBangPrefSweepSilent()
+    if ChoukaBangAllReady() == 1 then
+        ChoukaBangPrefFinish(0)
+        return
+    end
+
+    -- ⑥ 还没选的人：每隔 CHOUKA_BANG_PREF_REOPEN_EVERY 秒重弹一次自己的面板
+    --    （照官渡"每帧重弹"的思路，玩家手滑关掉/被引擎关掉都能马上再拿到）
+    if mod(ChoukaBangPrefTick - 1, CHOUKA_BANG_PREF_REOPEN_EVERY) == 0 then
         local i, name
         for i = 1, getn(ChoukaBangPrefPlayers), 1 do
             name = ChoukaBangPrefPlayers[i]
@@ -420,3 +586,7 @@ if ChoukaBangStage == 1 and ChoukaBangPrefDone ~= 1 then
         ChoukaBangPrefTickOnce()
     end
 end
+
+-- ============================================================
+-- 详见 docs/10-Lua注释存档.md §32_bang_pref-1
+-- ============================================================

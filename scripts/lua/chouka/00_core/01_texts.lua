@@ -95,13 +95,14 @@ ChoukaT.bangDegrade   = "本局不足 2 人，三国杀模式已自动降级为�
 ChoukaT.bangAssigned  = "三国杀身份已分配（%d 人局）：主%d 忠%d 反%d 内%d"
 ChoukaT.bangStartGo   = "三国杀模式开局！身份已私发给你，鼠标悬停顶部情报按钮可随时查看"
 
--- 身份偏好选择（复用原生选择页 + 文字选项，不自绘卡片/图标）
+-- 身份偏好选择（原生选择页 + 文字选项；★ 每个玩家一份独立面板，dialogId = 730 + 座位）
 ChoukaT.bangPrefTitle     = "三国杀 · 选择你想要的身份"
-ChoukaT.bangPrefBegin     = "身份偏好选择开始：在面板里点一个想要的身份即可（%d 秒后自动开始）"
+ChoukaT.bangPrefBegin     = "身份偏好开始：所有人选完才发身份开局（已选 %d/%d 人）"
+ChoukaT.bangPrefWait      = "身份偏好：已选 %d/%d 人，等其他人选完才开局"
 ChoukaT.bangPrefOption    = "%s（名额 %d）"
 ChoukaT.bangPrefAbstain   = "弃权（随机分配）"
 ChoukaT.bangPrefYouPicked = "你选择了：%s"
-ChoukaT.bangPrefTimeout   = "身份偏好时限到：没选的人按「弃权」处理"
+ChoukaT.bangPrefTimeout   = "身份偏好保险丝到点（%d 秒）：没选的人按「弃权」处理"
 ChoukaT.bangPrefNoApi     = "三国杀：当前环境没有原生选择页接口，身份偏好改为随机分配"
 ChoukaT.bangPrefNoModule  = "三国杀：偏好面板模块未加载，本局身份改为随机分配"
 
@@ -124,6 +125,9 @@ ChoukaT.bangGameOver   = "本局结束：%s"
 ChoukaT.bangRoster     = "全场身份公开：%s"
 ChoukaT.bangRosterItem = "%s=%s"
 ChoukaT.bangBoardLordMark = "%s【主公】"
+
+-- 座位守卫（退出 = 死亡，见 00_core/04_seat.lua）
+ChoukaT.seatGuardKill = "%s 的起重机被移交，按退出处理：已引爆起重机（遗物不转交队友）"
 
 -- 中立油井是默认规则的一部分，不做任何播报（作者 2026-10 定案），只写日志，故无 ChoukaT 条目。
 

@@ -120,10 +120,13 @@ end
 
 -- ---------------- ① 电脑每回合免费抽 1 个单位 ----------------
 
--- 这个座位还在打吗？起重机 = 本图的"水晶"（和 08_oilfield 的判据一致）。
+-- 这个座位还在打吗？起重机 = 本图的"水晶"（权威判定见 00_core/04_seat.lua，含"退出=死亡"）。
 --   ★ 实测：电脑被打掉起重机后，出局玩家的 unit spawn 依然生效，
 --     所以"死了还在造兵"。抽兵前必须先过这道门。
 function ChoukaAISeatAlive(index)
+    if type(ChoukaSeatAlive) == "function" then
+        return ChoukaSeatAlive(index)
+    end
     if type(GetObjectByScriptName) ~= "function" then
         return 1
     end

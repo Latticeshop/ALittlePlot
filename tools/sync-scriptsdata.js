@@ -64,8 +64,11 @@ const NODES = [
         deactivateUponSuccess: false,
     },
     {
-        // 初始化节点：抽卡等级表要先于一切（交易市场按钮、HUD、抽卡都用它）
+        // 初始化节点：座位状态判定要先于一切（收入/箱子/军犬/中央/AI/HUD/三国杀都用它），
+        // 其次是抽卡等级表（交易市场按钮、HUD、抽卡都用它）。
+        // 04_seat.lua 排第一：即使后面的 09_level / 00_init 报错，ChoukaSeatAlive 也已经定义好了。
         files: [
+            'lua/chouka/00_core/04_seat.lua',
             'lua/chouka/20_economy/09_level.lua',
             'lua/chouka/30_world/00_init.lua',
         ],
@@ -238,11 +241,12 @@ const NODES = [
         deactivateUponSuccess: false,
     },
     {
-        // 身份偏好投票：自绘 5 张卡片 + 确认按钮 + 180 秒超时
+        // 身份偏好：每人一份原生选择页（id = 730+座位），等所有人选完才发身份；
+        // 保险丝 CHOUKA_BANG_PREF_SECONDS(=300) 秒 + 静默兜底(=60 秒)，没选的按弃权
         file: 'lua/chouka/70_bang/32_bang_pref.lua',
         folder: '抽卡hex',
         name: '三国杀-偏好',
-        evaluationInterval: 1,       // ★ 必须是 1 秒：180 秒超时就靠这个节点数秒
+        evaluationInterval: 1,       // ★ 必须是 1 秒：保险丝/静默兜底/重弹面板都靠这个节点数秒
         deactivateUponSuccess: false,
     },
     {

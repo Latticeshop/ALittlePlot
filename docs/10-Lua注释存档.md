@@ -666,6 +666,128 @@
 -- 左下角（逐玩家文字，1~4 行）：回合数 / 倒计时 / 抽卡等级 / 概率
 ```
 
+## 04_seat.lua
+
+### §04_seat-1（手写补充，2026-xx 座位守卫）
+
+```lua
+-- 为什么要有这个文件（作者实测 bug）：
+--   本图把 craneN（起重机）当"死亡锚点"：起重机一没，塔 + 油井 + 单位连锁死亡。
+--   但玩家**直接退出**时，引擎不炸起重机，而是把资产移交给队友（结盟关系），
+--   于是 ObjectIsAlive(crane) 仍然为真、只是归属变了 —— 老代码就认为他"还活着"，
+--   三国杀不判死、不公开身份、不查胜负。作者定案：退出 = 完整死亡。
+--
+-- 判定口径：
+--   ChoukaSeatAlive(seat) = 1
+--       起重机存在 ∧ 存活 ∧ 归属仍是本人
+--   ChoukaSeatAlive(seat) = 0
+--       没有起重机 / 已被摧毁 / 归属明确变成了**另一个参战座位**的 Player_k
+--   ★ 归属口径刻意写得很窄：只有"读到的字符串正好等于另一个座位的 Player_k"才算被移交。
+--     读不到、读到怪字符串（空格 / $p1Name / 中立队…）一律当"还是本人"——
+--     宁可放过，也不能拿一个读不准的归属去炸活人的起重机。
+--   ChoukaSeatGuard()（01_income 每秒调一次）
+--       · 归属明确变成别人、且**曾经确认过归属是本人**（ChoukaSeatSelfSeen）、
+--         连续 CHOUKA_SEAT_MISMATCH_TOLERANCE(3) 秒
+--         → 立刻 ExecuteAction("NAMED_KILL", crane) 引爆，让连锁死亡跑完整套，
+--           遗物不转交队友；同时公屏播一条（ChoukaT.seatGuardKill）。
+--       · 三层防误杀：SelfSeen 前置 + 归属白名单口径 + 连读 3 次。
+--   ChoukaSeatIsHuman(seat)
+--       EvaluateCondition("PLAYER_IS_HUMAN_OR_AI_PERSONALITY", name, "Human")，
+--       与双兵种 BinaryLib / 20_hud 同一条判据（身份偏好用它分拣真人/电脑）。
+--
+-- 所有"这人还在不在"的判断都应走 ChoukaSeatAlive：
+--   01_income 底薪 / 02_private_box 刷箱 / 05_dog 补工程师 / 06_center 归属 / 17_ai 出兵 /
+--   20_hud 单位数 / 08_oilfield 重建 / 30_bang_mode 参战座位 / 33_bang_win 胜负 / 35 结盟面板
+```
+
+## 32_bang_pref.lua
+
+### §32_bang_pref-1（手写补充，2026-xx 偏好改版）
+
+```lua
+-- 作者定案（改版）：
+--   ① **每人一份独立面板**，互不干扰。面板 id = 730 + 座位号
+--      （和交易市场 700+座、防御塔 710+座 一个规矩）。
+--      参考《三国杀》核心规则 Bang_159/160：
+--        赤壁 BangPreferenceUiCreateAll() 是 `for player_id = 1, player_count` 给**每个座位**
+--        各建一套卡片（exCreateCustomButtonForPlayer）；官渡 showPreferenceDialog(player_id)
+--        的 dialogId 就是座位号。
+--      旧版全座位共用 id=730，一个座位应答就把别人的那份顶掉 → 实测表现为"一闪而过"。
+--   ② **等所有人选完**才发身份 + 开局（作者要求公平性），不再"谁选完就立刻开始"。
+--   ③ 参考图（赤壁 / 官渡）都给全部座位弹，AI 座位弹了也无害（它们不会点）——
+--      所以本版给**全部参战座位**都弹，AI 座位在 CHOUKA_BANG_PREF_AI_GRACE(6) 秒后自动按弃权收口。
+--      AI 判据：CHOUKA_AI_SLOTS 显式配置 > 房主/<1st Human Player> 一定算人 >
+--      PLAYER_IS_HUMAN_OR_AI_PERSONALITY "AI" > 判不出来就当人（宁可等，也不误当电脑）。
+--      参考图的偏好窗口是固定 150 秒（SchedulerModule.delay_call(assignRoles, 150)）。
+--   ④ 保险丝：万一有真人挂机不选，等到 CHOUKA_BANG_PREF_SECONDS(300) 才按弃权强行开局
+--      （设成 0 = 完全不等超时，只等所有人选完）。
+--   ④b 静默兜底：已经有人作答之后，还没作答的座位再等 CHOUKA_BANG_PREF_SILENT(60) 秒
+--      就按弃权 —— 专治"人格条件认不出电脑、电脑座位永远不点"。设 0 = 关掉。
+--   ⑤ 真人识别完全失灵时不做任何提前收口 —— 宁可等保险丝/静默兜底，
+--      也不能因为识别失灵把真人当成电脑提前结束（旧版就是这么把偏好搞没的）。
+--   ⑥ 没选的人每 CHOUKA_BANG_PREF_REOPEN_EVERY(2) 秒重弹一次自己的面板
+--      （照官渡"每次求值都重弹"的思路，玩家手滑关掉/被引擎关掉都能马上再拿到）。
+--   ⑦ 座位中途没了（退出/被拆）→ 自动按弃权，绝不为一个已经不在的人卡住整局。
+```
+
+## 33_bang_win.lua
+
+### §33_bang_win-1（手写补充，2026-xx 退出=死亡）
+
+```lua
+-- 出局判定 = ChoukaBangSeatAlive(seat)，内部走 00_core/04_seat.lua 的 ChoukaSeatAlive：
+--   起重机存在 ∧ 存活 ∧ 归属仍是本人。
+--   ★ 玩家**直接退出**也判死：退出时引擎把资产移交给队友（起重机不炸），
+--     04_seat.lua 的守卫看到归属变了就立刻 NAMED_KILL 引爆起重机 ——
+--     于是"退出"和"被打死"在本文件里表现完全一致（遗物不转交队友，而是连锁死亡）。
+--   旧版只看 ObjectIsAlive，所以退出的人永远"活着"：不判死、不公开身份、不查胜负。
+-- 胜负照赤壁 checkGameEnd（Bang_162_code:2-49），两处修正见 docs/11 §9③。
+```
+
+## 35_ally_panel.lua
+
+### §35_ally_panel-1（手写补充，2026-xx 身份公开）
+
+```lua
+-- 结盟/身份面板里的身份文字（作者要求：阵亡后像主公一样亮出身份，人人可见）：
+--   可见的只有三种 —— 自己的身份 / 主公（永远公开）/ 已阵亡者的身份（阵亡即公开）。
+--   规则实现在 ChoukaPanelRoleText(viewerSeat, seat)，文案用 ChoukaT.panelRole（"身份：%s"）。
+--   面板格子（ChoukaPanelPlayerLabel）：
+--     第 1 行 名字（补全角空格撑开文字盒子防折行）
+--     第 2 行 主公写"主公"；否则能看见身份就写"身份：X"（自己 / 已阵亡者）
+--     第 3 行 关系状态（阵亡者这里本来就写"已阵亡"）
+--   刷新：有人阵亡时 33 号节点会调 ChoukaPanelRefreshAllOpen()；本文件节点体另外盯
+--   一个"6 个座位存活状态"指纹（ChoukaPanelAliveSig），一变就把开着的面板重画一遍。
+```
+
+## 09_level.lua（补充）
+
+### §09_level-2（手写补充，2026-xx 等级按人独立）
+
+```lua
+-- 旧版是一个全局 ChoukaDrawLevel：任何人升一级，全场跟着升（作者实测 bug）。
+-- 现在改成每个玩家一份 ChoukaDrawLevelOf[playerName]，所有读写走
+--   ChoukaLevelGet(name) / ChoukaLevelSet(name, level) / ChoukaBuyLevel(name)
+-- 影响：交易市场页的价格与"你现在 Lv.N"文案、抽卡概率（12_puredraw_replace 的
+--   ChoukaChooseUnit 用抽卡人自己的等级）、HUD 左下文字、计分板第 9/10 行
+--   （用 exScoreBoardSetTextForPlayer 每人写一份）、自检心跳里的 lv 列表。
+-- 自动升级（回合 5/10/15/20）保留，语义变成"给每个人抬到该回合的保底等级"，
+--   只升不降，并用 ChoukaTellPlayer 私聊告知本人。
+```
+
+## 01_income.lua（补充）
+
+### §01_income-2（手写补充，2026-xx 主公 ×1.5 停用）
+
+```lua
+-- ★ 三国杀主公底薪 ×1.5 的加成已按作者实测要求停用：
+--   理由（作者原话）：实战里主公已经很有优势了 —— 先手、能买塔、前期不太会被低级单位集火，
+--   再叠 1.5 倍底薪会滚雪球，所以砍掉，全员同额底薪（20/秒）。
+-- 停用方式：常量 CHOUKA_BANG_LORD_INCOME_MULT 与循环里的 lordMult 四行都**注释保留**，
+--   想恢复把注释去掉即可；原始设计说明见 docs/11 §8。
+-- 油井 20/秒、中央油井 40/秒 本来就不吃这个加成，不受影响。
+```
+
 ---
 
 统计：搬走 34 段、共 32122 B；lua 总体 151090 B → 120357 B（省 30733 B）。

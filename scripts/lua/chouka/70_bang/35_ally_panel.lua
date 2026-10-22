@@ -150,7 +150,11 @@ function ChoukaPanelName(seat)
 end
 
 -- 这个座位还在打吗（起重机 = 本图的"水晶"）
+-- ★ 先问 00_core/04_seat.lua 的权威判定（含"退出/被占领 → 归属变了 = 死了"）
 function ChoukaPanelSeatAlive(seat)
+    if type(ChoukaSeatAlive) == "function" then
+        return ChoukaSeatAlive(seat)
+    end
     if type(ChoukaBangSeatAlive) == "function" then
         if ChoukaBangSeatAlive(seat) == 1 then
             return 1
@@ -197,8 +201,7 @@ end
 
 -- 身份文字：**可见性规则与悬浮框一致**（docs/11 §6③），绝不能把别人的身份直接写出来。
 --   能看见的只有三种：自己的身份 / 主公（公开）/ 已阵亡者的身份（阵亡即公开）。
-function ChoukaPanelRoleText(viewerSeat, seat)
-    if CHOUKA_MODE ~= 1 then
+function ChoukaPanelRoleText(viewerSeat, seat)    if CHOUKA_MODE ~= 1 then
         return nil
     end
     if type(ChoukaBangRole) ~= "table" then
@@ -275,18 +278,39 @@ function ChoukaPanelPanelName(seat)
 end
 
 
--- 面板格子：第一行名字（后面补全角空格把文字盒子撑开，防止折行），
--- 三国杀里主公多一行"主公"（官渡同款，方便一眼认出并优先选择），最后一行是关系状态。
+-- 面板格子：第一行名字（补全角空格撑开文字盒子，防折行）；三国杀里第二行是
+-- "可见的身份"（主公永远公开 / 阵亡者阵亡即公开 / 自己）；最后一行是关系状态。
 function ChoukaPanelPlayerLabel(viewerSeat, targetSeat)
     local out
     out = ChoukaPanelPanelName(targetSeat) .. CHOUKA_PANEL_PAD
     if CHOUKA_MODE == 1 and type(ChoukaBangRole) == "table" then
         if ChoukaBangRole[targetSeat] == ChoukaT.bangRoleLord then
+            -- 主公：人人都看得见的公开身份
             out = out .. "\n" .. ChoukaT.panelLordMark
+        else
+            -- ★ 身份行：自己 / 已阵亡者 → 可见（规则在 ChoukaPanelRoleText 里：自己·主公·已阵亡）
+            local roleText = ChoukaPanelRoleText(viewerSeat, targetSeat)
+            if roleText ~= nil then
+                out = out .. "\n" .. roleText
+            end
         end
     end
     out = out .. "\n" .. ChoukaPanelRelationShort(viewerSeat, targetSeat)
     return out
+end
+
+
+-- 把"当前所有开着的面板"重画一遍（阵亡 / 结盟变化后立刻生效，不用玩家手动关开）
+function ChoukaPanelRefreshAllOpen()
+    local i, playerName, state
+    for i = 1, 6, 1 do
+        playerName = ChoukaPanelName(i)
+        state = ChoukaPanelState[playerName]
+        if state == "open" then
+            ChoukaPanelShowList(i)
+        end
+    end
+    return 1
 end
 
 
@@ -658,6 +682,26 @@ if CHOUKA_BANG_ENDED == 1 and CHOUKA_MODE == 1 then
         local i
         for i = 1, 6, 1 do
             ChoukaPanelHide(i)
+        end
+    end
+end
+
+-- 存活状态一变（有人阵亡 / 有人被守卫引爆）→ 把开着的面板重画一遍，
+-- 让"已阵亡者的身份"当场点亮，不用玩家手动关掉再开。
+if CHOUKA_MODE == 1 and ChoukaBangRolesReady == 1 and CHOUKA_BANG_ENDED ~= 1 then
+    local sig = ""
+    local i
+    for i = 1, 6, 1 do
+        if ChoukaPanelSeatAlive(i) == 1 then
+            sig = sig .. "1"
+        else
+            sig = sig .. "0"
+        end
+    end
+    if ChoukaPanelAliveSig ~= sig then
+        ChoukaPanelAliveSig = sig
+        if type(ChoukaPanelRefreshAllOpen) == "function" then
+            ChoukaPanelRefreshAllOpen()
         end
     end
 end

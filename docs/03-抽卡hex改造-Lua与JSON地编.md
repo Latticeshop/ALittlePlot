@@ -27,7 +27,7 @@
 | `抽卡hex/自检` | 1（≈1 秒） | ❌ 常驻 | `CONDITION_TRUE` | **排第一个**：整局每 10 秒往日志写一行心跳（started / round / boxLeft / lv / hud / 已就绪节点），并给每个节点打「节点就绪」标记 —— 排查"流程断在哪"的第一现场 | `00_selfcheck.lua`（构建时自动拼上 `00_alert.lua`） |
 | `抽卡hex/开局` | 1（≈1 秒） | ❌ 常驻 | `CONDITION_TRUE` | **开局三段**：锁视角到 `center` + 全屏公告 + 中心提示 → 房主点「已阅读」开配置页（两个二选一：抽卡只有自己阵营 / 箱子包括全部阵营）→ 点「确认，开始游戏」后视角回出生点/解锁/写入 `CHOUKA_DRAW_SCOPE`/倒计时起步；并定义两个对话框回调的分发器（docs/06、docs/08 §4） | `03_start.lua` |
 | `抽卡hex/随机箱清理` | 0（每帧） | ❌ 常驻 | `CONDITION_TRUE` | 照 DSA 的两段删除：第 1 帧删 `GenericCrateSpawner`（刷箱器）→ 第 45 帧清已落地的实体随机箱（离预设点位 80 以内放过）→ 前 2 分钟每 10 秒兜底补扫（docs/07） | `07_crates.lua` |
-| `抽卡hex/初始化` | 0（每帧） | ✅ 成功即自我停用 | `CONDITION_TRUE` | 抽卡等级表、全图常亮、基础电力、关闭建造栏、开局资金**兜底** 5096、倒计时初值 | `09_level.lua` + `00_init.lua` |
+| `抽卡hex/初始化` | 0（每帧） | ✅ 成功即自我停用 | `CONDITION_TRUE` | 座位状态权威（`ChoukaSeatAlive` / 座位守卫）、抽卡等级表、全图常亮、基础电力、关闭建造栏、开局资金**兜底** 5096、倒计时初值 | `04_seat.lua` + `09_level.lua` + `00_init.lua` |
 | `抽卡hex/收入` | 1（≈1 秒） | ❌ 常驻 | `CONDITION_TRUE` | 底薪 + 油井加成，顺手重设电力（**开局后才结算**） | `01_income.lua` |
 | `抽卡hex/私有箱` | 1（≈1 秒，**自己数秒**） | ❌ 常驻 | `CONDITION_TRUE` | 每秒把 `CHOUKA_BOX_LEFT` 减 1，减到 0 才开新回合：每人两个点位各刷一个箱子（种类见 `02a_crate_list.lua`，已有箱子就跳过）+ 重置倒计时 + 回合数 +1（**开局后才走**） | `02_private_box.lua` |
 | `抽卡hex/抽卡初始化` | 0（每帧） | ✅ 成功即自我停用 | `CONDITION_TRUE` | 截获原版抽卡结果并转成卡池单位：**原生结果几个就补几个**（单抽 1 / 十连 10，上限 10），按阵营池 + 水陆筛选（docs/08 §2、§5） | `10_puredraw_data.lua` + `gen_pool.lua` + `11_puredraw_hook.lua` + `12_puredraw_replace.lua` |
@@ -58,15 +58,16 @@ ALittlePlot/
 │  ├─ lua/chouka/                      ← Lua 真源，按职责分 9 个目录（另有 chouka/README.md）
 │  │  ├─ 00_core/                        公共底座：构建时拼到**每个**节点最前面
 │  │  │  ├─ 00_alert.lua                 **诊断通道**（_LOG / _ALERT / 节点自检）
-│  │  │  └─ 01_texts.lua                 **文案总表**（所有玩家可见文本，tools/extract-texts.js 生成）
+│  │  │  ├─ 01_texts.lua                 **文案总表**（所有玩家可见文本，tools/extract-texts.js 生成）
+│  │  │  └─ 04_seat.lua                  **座位状态权威**（ChoukaSeatAlive / 座位守卫：退出=死亡，见 docs/11 §10⑤）
 │  │  ├─ 10_boot/                        启动与总调度
 │  │  │  ├─ 00_selfcheck.lua             **自检心跳**（每 10 秒一行日志，排第一个节点）
 │  │  │  ├─ 03_start.lua                 **开局流程**（锁视角+公告+房主配置+正式开始，docs/06）
 │  │  │  ├─ 13_frame_loop.lua            每帧驱动 + 开局超时兜底
 │  │  │  └─ 14_grant_draw.lua            发抽卡技能（单抽 + 十连，开局后才发）
 │  │  ├─ 20_economy/                     经济与成长
-│  │  │  ├─ 01_income.lua                收入（底薪 / 油井 / 中央油井；三国杀主公底薪 ×1.5）
-│  │  │  ├─ 09_level.lua                 抽卡等级表（等级 → 各档概率 / 升级价）
+│  │  │  ├─ 01_income.lua                收入（底薪 / 油井 / 中央油井；三国杀主公 ×1.5 已停用）
+│  │  │  ├─ 09_level.lua                 抽卡等级表（等级 → 各档概率 / 升级价；★ 等级按玩家独立）
 │  │  │  └─ 15_upgrades.lua              开局 GIVE_PLAYER_UPGRADE 全发
 │  │  ├─ 30_world/                       地图底座与中立点位
 │  │  │  ├─ 00_init.lua                  地图级一次性别（视野/电力/禁建造/资金兜底/倒计时初值）
@@ -88,14 +89,15 @@ ALittlePlot/
 │  │  ├─ 70_bang/                        **三国杀模式**（docs/11）
 │  │  │  ├─ 30_bang_mode.lua             身份核心：参战座位 / 身份表 / 洗牌 / 发身份 / 顶部情报按钮
 │  │  │  ├─ 31_bang_alliance.lua         结盟（单向 / 双向 PLAYER_RELATES_PLAYER）
-│  │  │  ├─ 32_bang_pref.lua             身份偏好投票卡片 + 180 秒超时
-│  │  │  └─ 33_bang_win.lua              胜负判定与结算
+│  │  │  ├─ 32_bang_pref.lua             身份偏好（每人一份原生选择页，等所有人选完，300 秒保险丝）
+│  │  │  ├─ 33_bang_win.lua              胜负判定与结算
+│  │  │  └─ 35_ally_panel.lua            结盟/身份面板（docs/13）：阵亡后亮身份、面板自动刷新
 │  │  └─ 90_gen/                         **生成物目录，勿手改**
 │  │     ├─ 09a_watermask.lua            海/陆掩码（tools/build-watermask.js）
 │  │     ├─ gen_pool.lua                 卡池 + 阵营池 + 类别表（tools/build-pool.js）
 │  │     ├─ gen_allunits.lua             全部单位类型表（日冕单位信息汇总.txt 全表）
 │  │     └─ gen_upgrades.lua             要解锁的科技协议名单（tools/build-upgrades.js）
-│  └─ ScriptsData.json                  ← 生成物（给 JSON 地编导入，21 个节点）
+│  └─ ScriptsData.json                  ← 生成物（给 JSON 地编导入，26 个节点）
 └─ tools/
    ├─ sync-scriptsdata.js               ← 生成器（零依赖 node；支持一个节点拼多个 lua）
    ├─ build-pool.js                     ← 卡池生成器（读作者《完整单位表》+ 两份中文字典）
@@ -387,8 +389,13 @@ node tools/split-log-texts.js           # 反过来：把只进日志的条目�
   概率表（T1~T5，%）：
   Lv1 100/0/0/0/0、Lv2 90/10、Lv3 75/25、Lv4 55/30/15、Lv5 45/33/20/2、
   Lv6 30/40/25/5、Lv7 16/30/43/10/1、Lv8 15/20/34/30/1。
-- 抽卡时 `ChoukaChooseUnit` 先按**当前等级的概率表**掷档，再档内均匀取，再按阵营 + 水陆收窄。
-- **等级是全场共用的一个进度**（这张图只有 6 个小格，做成公共进度；任何人买都会推进全场）。
+- 抽卡时 `ChoukaChooseUnit` 先按**抽卡人当前等级的概率表**掷档，再档内均匀取，再按阵营 + 水陆收窄。
+- ★ **等级是每个人各一份**（2026-xx 定案，修掉"一人升级全场跟着升"的 bug）：
+  数据在 `ChoukaDrawLevelOf[playerName]`，接口 `ChoukaLevelGet / ChoukaLevelSet / ChoukaBuyLevel`。
+  受影响的地方：交易市场页的价格与「你现在 Lv.N」文案、抽卡概率、HUD 左下文字、
+  计分板第 9/10 行（`exScoreBoardSetTextForPlayer` 每人写一份，没有就退回全局 Player_1）。
+  「自动升级」保留，语义 = 第 5/10/15/20 回合**给每个人**抬到 Lv.2/3/4/5（只升不降），
+  并用 `ChoukaTellPlayer` 私聊告知本人，不会因为别人升级而顺带抬你。
 - **交易市场**（顶部按钮 3）里两项：`购买等级`（按 `ChoukaLevelPrice` 扣钱升级）、
   `购买防御塔`（`ChoukaTowerPriceByTier` 扣钱：**T1 ￥500 / T2 ￥2000 / T3 ￥7500 / T4 ￥20000**，
   在自家 `towerN1~towerN4` 生成随机塔；塔池见 `16_buttons.lua` 的 `ChoukaTowerPoolByTier`）。
